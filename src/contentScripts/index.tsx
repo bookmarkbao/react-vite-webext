@@ -1,9 +1,19 @@
+/*
+ * @Descripttion: 
+ * @Author: xiangjun02
+ * @Date: 2022-04-01 22:48:45
+ * @LastEditors: xiangjun02
+ * @LastEditTime: 2022-04-01 23:55:18
+ */
 /* eslint-disable no-console */
 import React from "react";
 import ReactDOM from "react-dom";
 import { onMessage } from "webext-bridge";
 import browser from "webextension-polyfill";
 import { ContentApp } from "./views/ContentApp";
+// import ContentApp from './views/Main'
+// import ContentApp from './views/MainApp'
+import './style.css'
 
 // Firefox `browser.tabs.executeScript()` requires scripts return a primitive value
 (() => {

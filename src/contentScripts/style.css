@@ -1,0 +1,8 @@
+.dx-content,
+.dx-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: pink;
+  z-index: 1000;
+}

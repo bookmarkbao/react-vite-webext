@@ -1,8 +1,16 @@
+/*
+ * @Descripttion: 
+ * @Author: xiangjun02
+ * @Date: 2022-04-01 22:48:45
+ * @LastEditors: xiangjun02
+ * @LastEditTime: 2022-04-02 00:39:20
+ */
 import { dirname, relative } from "path";
 import { defineConfig, UserConfig } from "vite";
 import AutoImport from "unplugin-auto-import/vite";
 import { r, port, isDev } from "./scripts/utils";
 import react from "@vitejs/plugin-react";
+import vitePluginImp from 'vite-plugin-imp'
 
 export const sharedConfig: UserConfig = {
   root: r("src"),
@@ -26,6 +34,14 @@ export const sharedConfig: UserConfig = {
       ],
       dts: r("src/auto-imports.d.ts"),
     }),
+    vitePluginImp({
+      libList: [
+        {
+          libName: 'antd',
+          style: (name) => `antd/es/${name}/style`
+        }
+      ]
+    }),
 
     // rewrite assets to use relative path
     {
@@ -43,6 +59,17 @@ export const sharedConfig: UserConfig = {
   optimizeDeps: {
     include: ["webextension-polyfill"],
   },
+  css: {
+    modules: {
+      localsConvention: 'camelCaseOnly'
+    },
+    preprocessorOptions: {
+      less: {
+        modifyVars: { 'primary-color': '#13c2c2' },
+        javascriptEnabled: true
+      }
+    }
+  }
 };
 
 export default defineConfig(({ command }) => ({
@@ -70,5 +97,5 @@ export default defineConfig(({ command }) => ({
       },
     },
   },
-  plugins: [...sharedConfig.plugins!],
+  plugins: [...sharedConfig.plugins!]
 }));

@@ -1,3 +1,10 @@
+/*
+ * @Descripttion: 
+ * @Author: xiangjun02
+ * @Date: 2022-04-04 00:39:25
+ * @LastEditors: xiangjun02
+ * @LastEditTime: 2022-04-04 00:42:55
+ */
 import fs from 'fs-extra'
 import type { Manifest } from 'webextension-polyfill'
 import type PkgType from '../package.json'
@@ -44,6 +51,7 @@ export async function getManifest() {
     }],
     web_accessible_resources: [
       'dist/contentScripts/style.css',
+      "dist/views/index.html"
     ],
   }
 

@@ -1,6 +1,6 @@
 {
-  "name": "vitesse-webext",
-  "displayName": "Vitesse WebExt",
+  "name": "a-vitesse-webext",
+  "displayName": "a Vitesse WebExt",
   "version": "0.0.2",
   "description": "[description]",
   "private": true,
@@ -56,7 +56,9 @@
     "web-ext": "^6.4.0"
   },
   "dependencies": {
+    "@ant-design/icons": "^4.7.0",
     "antd": "^4.16.13",
+    "babel-polyfill": "^6.26.0",
     "css-loader": "^2.1.1",
     "less": "^3.9.0",
     "less-loader": "^4.1.0",

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Switch, Collapse, Button, Input, Select, Badge, Tooltip } from "antd";
-// import { sendMessage } from "webext-bridge";
+import { sendMessage } from "webext-bridge";
 
 import { PlusCircleOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import Replacer from "~/components/Replacer";
@@ -275,11 +275,16 @@ export default class Main extends Component {
       </Panel>
     );
   }
-  getTodo() {
-    // console.log('getTodo>>',sendMessage)
-    // sendMessage('get-todo', (result)=>{
-    //   console.log('getTodo >> sendMessage >> result', result)
-    // })
+  async getTodo() {
+    console.log('getTodo>>',sendMessage)
+    // const result = await sendMessage('get-todo')
+    const result = await  sendMessage(
+      "get-todo",
+      { code: "ok", msg: "保存成功", data: "get-todo >> onMessage" },
+      { context: "background-script", tabId: 145 }
+    );
+    console.log('getTodo >> sendMessage >> result', result)
+  
     // 该方法在popup中执行，无任何问题
     // chrome.storage.local.get(
     //   ["ajaxInterceptor_switchOn", "ajaxInterceptor_rules"],

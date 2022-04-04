@@ -1,4 +1,11 @@
-import { sendMessage } from "webext-bridge";
+/*
+ * @Descripttion:
+ * @Author: xiangjun02
+ * @Date: 2022-04-04 00:51:12
+ * @LastEditors: xiangjun02
+ * @LastEditTime: 2022-04-04 12:40:37
+ */
+import { sendMessage, onMessage } from "webext-bridge";
 import { Tabs } from "webextension-polyfill";
 import browser from "webextension-polyfill";
 
@@ -41,6 +48,17 @@ browser.tabs.onActivated.addListener(async ({ tabId }) => {
     { title: tab.title },
     { context: "content-script", tabId }
   );
+  sendMessage(
+    "get-todo-content",
+    { code: "ok", msg: "保存成功", data: "get-todo >> onMessage", tabId },
+    { context: "content-script", tabId }
+  );
+});
+
+// sendMessage("get-todo-content", { title: tab.title }, { context: "content-script", tabId });
+onMessage("get-todo", async () => {
+  console.log("background >> get-todo");
+  return { code: "ok", msg: "保存成功", data: "get-todo >> onMessage" };
 });
 
 // onMessage("get-current-tab", async () => {
@@ -55,3 +73,4 @@ browser.tabs.onActivated.addListener(async ({ tabId }) => {
 //     };
 //   }
 // });
+

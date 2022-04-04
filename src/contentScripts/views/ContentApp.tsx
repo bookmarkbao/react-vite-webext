@@ -3,10 +3,10 @@
  * @Author: xiangjun02
  * @Date: 2022-04-01 22:48:45
  * @LastEditors: xiangjun02
- * @LastEditTime: 2022-04-02 00:42:03
+ * @LastEditTime: 2022-04-04 00:42:28
  */
 import { Button } from 'antd';
-
+import './content'
 export const ContentApp = () => {
   return <div className="dx-content">Hey!
     <Button type="primary">Primary Button</Button>

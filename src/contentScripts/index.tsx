@@ -3,7 +3,7 @@
  * @Author: xiangjun02
  * @Date: 2022-04-01 22:48:45
  * @LastEditors: xiangjun02
- * @LastEditTime: 2022-04-01 23:55:18
+ * @LastEditTime: 2022-04-04 12:33:49
  */
 /* eslint-disable no-console */
 import React from "react";
@@ -17,11 +17,14 @@ import './style.css'
 
 // Firefox `browser.tabs.executeScript()` requires scripts return a primitive value
 (() => {
-  console.info("[vitesse-webext] Hello world from content script");
+  // console.info("[vitesse-webext] Hello world from content script");
 
   // communication example: send previous tab title from background page
   onMessage("tab-prev", ({ data }) => {
-    console.log(`[vitesse-webext] Navigate from page "${data}"`);
+    console.log(`[vitesse-webext-xiangjun] Navigate from page "${data}"`);
+  });
+  onMessage("get-todo-content", (data) => {
+    console.log(`[get-todo-content] Navigate from page "${data}"`, data);
   });
 
   // mount component to context window

@@ -3,7 +3,7 @@
  * @Author: xiangjun02
  * @Date: 2022-04-04 00:51:12
  * @LastEditors: xiangjun02
- * @LastEditTime: 2022-04-04 12:40:37
+ * @LastEditTime: 2022-04-04 18:04:37
  */
 import { sendMessage, onMessage } from "webext-bridge";
 import { Tabs } from "webextension-polyfill";
@@ -73,4 +73,34 @@ onMessage("get-todo", async () => {
 //     };
 //   }
 // });
+
+
+// 接收iframe传来的信息，转发给content.js
+// chrome.runtime.onMessage.addListener((msg, sender, callback) => {
+browser.runtime.onMessage.addListener((msg, sender, callback) => {
+  console.log('chrome.runtime.onMessage.addListener >>> ',msg)
+  callback && callback('99999999999999')
+  // if (msg.type === 'ajaxInterceptor' && msg.to === 'background') {
+  //   if (msg.key === 'ajaxInterceptor_switchOn') {
+  //     if (msg.value === true) {
+  //       chrome.browserAction.setIcon({path: {
+  //         16: '/images/16.png',
+  //         32: '/images/32.png',
+  //         48: '/images/48.png',
+  //         128: '/images/128.png',
+  //       }});
+  //     } else {
+  //       chrome.browserAction.setIcon({path: {
+  //         16: '/images/16_gray.png',
+  //         32: '/images/32_gray.png',
+  //         48: '/images/48_gray.png',
+  //         128: '/images/128_gray.png',
+  //       }});
+  //     }
+  //   }
+  //   chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+  //     chrome.tabs.sendMessage(tabs[0].id, {...msg, to: 'content'});
+  //   })
+  // }
+});
 

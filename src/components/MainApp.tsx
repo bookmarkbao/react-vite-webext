@@ -276,14 +276,28 @@ export default class Main extends Component {
     );
   }
   async getTodo() {
-    console.log('getTodo>>',sendMessage)
-    // const result = await sendMessage('get-todo')
-    const result = await  sendMessage(
-      "get-todo",
-      { code: "ok", msg: "保存成功", data: "get-todo >> onMessage" },
-      { context: "background-script", tabId: 145 }
-    );
-    console.log('getTodo >> sendMessage >> result', result)
+    // 'devtools' | 'background' | 'popup' | 'options' | 'content-script' | 'window'
+    const key = 'test9999'
+    const value = 'xiangjun999'
+    chrome.runtime.sendMessage(chrome.runtime.id, {
+      type: "ajaxInterceptor",
+      to: "background",
+      key,
+      value,
+    },(result)=>{
+      console.log('result 8888 >', result);
+    });
+    sendMessage('get-todo',{}, 'background').then(result => {
+      console.log('get-todo MainApp', result);
+    })
+    // console.log('getTodo>>',sendMessage)
+    // // const result = await sendMessage('get-todo')
+    // const result = await  sendMessage(
+    //   "get-todo",
+    //   { code: "ok", msg: "保存成功", data: "get-todo >> onMessage" },
+    //   { context: "background-script", tabId: 145 }
+    // );
+    // console.log('getTodo >> sendMessage >> result', result)
   
     // 该方法在popup中执行，无任何问题
     // chrome.storage.local.get(

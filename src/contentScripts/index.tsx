@@ -3,7 +3,7 @@
  * @Author: xiangjun02
  * @Date: 2022-04-01 22:48:45
  * @LastEditors: xiangjun02
- * @LastEditTime: 2022-04-05 21:35:57
+ * @LastEditTime: 2022-04-06 02:06:52
  */
 /* eslint-disable no-console */
 import React, { useEffect, useState } from "react";
@@ -14,7 +14,7 @@ import { ContentApp } from "./views/ContentApp";
 import { ContentIframe } from "./views/ContentIframe";
 
 // 执行代码注入
-import './views/ajaxInterceptor'
+// import './views/ajaxInterceptor'
 
 // import ContentApp from './views/Main'
 // import ContentApp from './views/MainApp'

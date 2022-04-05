@@ -2,7 +2,8 @@ import React from "react";
 import { Switch, Collapse, Button, Input, Select } from "antd";
 import { MinusCircleOutlined } from "@ant-design/icons";
 import Replacer from "~/components/Replacer";
-import { useSettingsStore, ajaxInterceptor_rules } from "./useSettingsStore.ts";
+import { useSettingsStore } from "./useSettingsStore.ts";
+// import { useSettingsStore, ajaxInterceptor_rules } from "./useSettingsStore.ts";
 import { toggleIframe } from "~/logic/utils";
 import "./Main.less";
 const { Option } = Select;
@@ -11,14 +12,18 @@ const Panel = Collapse.Panel;
 // if you need to state be preserved in `chrome.storage.sync` use useChromeStorageSync
 export const MainApp = () => {
   const [settings, setSettings, isPersistent, error] = useSettingsStore();
-  settings.init &&
-    setSettings((prevState) => {
-      return {
-        ...prevState,
-        init: false,
-        ajaxInterceptor_rules,
-      };
-    });
+  // settings.init &&
+  //   setSettings((prevState) => {
+  //     return {
+  //       ...prevState,
+  //       init: false,
+  //       ajaxInterceptor_rules,
+  //     };
+  //   });
+
+  // 必须在这个之前，把数据同步过去
+  // chrome.runtime.sendMessage(chrome.runtime.id, { type: 'ajaxInterceptor', to: 'background', iframeScriptLoaded: true });
+
   const saveTodo = async ({ key, value }) => {
     if (!chrome.storage) {
       console.log("不支持");
@@ -79,7 +84,7 @@ export const MainApp = () => {
     ajaxInterceptor_rules[i][keyName] = value;
     setSettings((prevState) => ({
       ...prevState,
-      ajaxInterceptor_rules,
+      ajaxInterceptor_rules
     }));
     set("ajaxInterceptor_rules", ajaxInterceptor_rules);
   };

@@ -3,16 +3,31 @@
  * @Author: xiangjun02
  * @Date: 2022-04-05 21:33:25
  * @LastEditors: xiangjun02
- * @LastEditTime: 2022-04-05 21:54:19
+ * @LastEditTime: 2022-04-06 02:01:45
  */
 function log() {
-  console.log(...arguments);
+  console.log("react>>>", ...arguments);
 }
+
+const initTest = {
+  ajaxInterceptor_switchOn: true,
+  ajaxInterceptor_rules: [
+    {
+      key: "dc8c1ac5-bf95-4588-ac30-0e6977aceb02",
+      label: "url9",
+      match: "/sugrec",
+      overrideTxt:
+        '{\n    "q": "测试",\n    "p": false,\n    "g": [\n        {\n            "type": "sug",\n            "sa": "s_1",\n            "q": "测试抑郁程度的问卷"\n        },\n        {\n            "type": "sug",\n            "sa": "s_2",\n            "q": "测试工程师"\n        },\n        {\n            "type": "sug",\n            "sa": "s_3",\n            "q": "测试人格"\n        },\n        {\n            "type": "sug",\n            "sa": "s_4",\n            "q": "测试怀孕的试纸图片一深一浅"\n        },\n        {\n            "type": "sug",\n            "sa": "s_5",\n            "q": "测试怀孕的试纸怎么看"\n        },\n        {\n            "type": "sug",\n            "sa": "s_6",\n            "q": "测试用例模板和例子"\n        },\n        {\n            "type": "sug",\n            "sa": "s_7",\n            "q": "测试怀孕什么时候最准确"\n        },\n        {\n            "type": "sug",\n            "sa": "s_8",\n            "q": "测试网速"\n        },\n        {\n            "type": "sug",\n            "sa": "s_9",\n            "q": "测试用例"\n        },\n        {\n            "type": "sug",\n            "sa": "s_10",\n            "q": "测试怀孕最早几天可以查出来"\n        }\n    ],\n    "slid": "102820935623092",\n    "queryid": "0xe5d83dd57e1b4"\n}',
+      switchOn: true,
+    },
+  ],
+};
 // 命名空间
 let ajax_interceptor_qoweifjqon = {
   settings: {
     ajaxInterceptor_switchOn: false,
     ajaxInterceptor_rules: [],
+    ...initTest,
   },
   originalXHR: window.XMLHttpRequest,
   myXHR: function () {
@@ -194,28 +209,35 @@ let ajax_interceptor_qoweifjqon = {
       });
   },
 };
+console.log("ajax_interceptor_qoweifjqon start", ajax_interceptor_qoweifjqon);
 // 从background，iframe过来的信息，更新内容
-window.addEventListener("message", function (event) {
+window.addEventListener(
+  "message",
+  function (event) {
     const data = event.data;
     console.log("react window.addEventListener >> message", data);
     if (data.type === "ajaxInterceptor" && data.to === "pageScript") {
       ajax_interceptor_qoweifjqon.settings[data.key] = data.value;
     }
-
+    console.log("ajax_interceptor_qoweifjqon >>", ajax_interceptor_qoweifjqon);
+    window.xiangjun9999 = 'xiangjun9999'
     if (ajax_interceptor_qoweifjqon.settings.ajaxInterceptor_switchOn) {
+      console.log("myXHR > window.XMLHttpRequest", window.XMLHttpRequest);
+      console.log("myFetch > window.fetch", window.fetch);
       window.XMLHttpRequest = ajax_interceptor_qoweifjqon.myXHR;
       window.fetch = ajax_interceptor_qoweifjqon.myFetch;
     } else {
       window.XMLHttpRequest = ajax_interceptor_qoweifjqon.originalXHR;
       window.fetch = ajax_interceptor_qoweifjqon.originalFetch;
+      console.log("originalXHR > window.XMLHttpRequest", window.XMLHttpRequest);
+      console.log("originalFetch > window.fetch", window.fetch);
     }
   },
   false
 );
 
-
 // ============ 以下为content内容 ============
-let iframeLoaded = false
+let iframeLoaded = false;
 // 接收background.js传来的信息，转发给pageScript
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg.type === "ajaxInterceptor" && msg.to === "content") {
@@ -256,3 +278,4 @@ window.addEventListener(
   },
   false
 );
+

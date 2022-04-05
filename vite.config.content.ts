@@ -3,7 +3,7 @@
  * @Author: xiangjun02
  * @Date: 2022-04-01 22:48:45
  * @LastEditors: xiangjun02
- * @LastEditTime: 2022-04-05 13:26:57
+ * @LastEditTime: 2022-04-06 02:40:57
  */
 import { defineConfig } from "vite";
 import { sharedConfig } from "./vite.config";

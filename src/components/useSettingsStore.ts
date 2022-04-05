@@ -3,7 +3,7 @@
  * @Author: xiangjun02
  * @Date: 2022-04-04 22:18:06
  * @LastEditors: xiangjun02
- * @LastEditTime: 2022-04-05 15:45:21
+ * @LastEditTime: 2022-04-05 23:41:32
  */
 // common/useSettingsStore.js
 import { createChromeStorageStateHookLocal } from "use-chrome-storage";
@@ -64,7 +64,7 @@ const INITIAL_VALUE = {
   showAvatar: true,
   showHistory: false,
   ajaxInterceptor_switchOn: true,
-  ajaxInterceptor_rules: ajaxInterceptor_rules,
+  ajaxInterceptor_rules: [],
   // ajaxInterceptor_rules: [],
 };
 

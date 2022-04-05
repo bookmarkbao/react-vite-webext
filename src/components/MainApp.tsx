@@ -77,9 +77,20 @@ export const MainApp = () => {
       ...prevState,
     }));
   };
-  const updateAddBtnTop = () => {};
-  const onChangeReplace = (val, val2) => {
-    console.log("onChangeReplace", val, val2);
+  const updateAddBtnTop = () => {
+    console.log('updateAddBtnTop', 99999)
+  };
+  const onChangeReplace = (key, value, item, index) => {
+    settings.ajaxInterceptor_rules[index] = {
+      ...item,
+      [key]: value
+    }
+    // console.log({
+    //   ...item,
+    //   key: value
+    // })
+    // console.log("onChangeReplace", key, value, item, index);
+    setSettings((prevState) => ({...prevState}))
   };
 
   const renderPanelHeader = (item, index) => {
@@ -144,7 +155,7 @@ export const MainApp = () => {
           defaultValue={overrideTxt}
           updateAddBtnTop={updateAddBtnTop}
           index={index}
-          set={onChangeReplace}
+          set={(key, value)=>(onChangeReplace(key, value, item, index))}
         />
         {/* {this.state.interceptedRequests[match] && (
           <>

@@ -3,7 +3,7 @@
  * @Author: xiangjun02
  * @Date: 2022-04-02 00:53:11
  * @LastEditors: xiangjun02
- * @LastEditTime: 2022-04-02 01:09:04
+ * @LastEditTime: 2022-04-05 17:06:26
  */
 import React, {Component} from 'react';
 import {Switch} from 'antd';
@@ -48,18 +48,15 @@ export default class Replacer extends Component {
       
     }
     this.setState({txt, src});
-
     // 更新缓存
-    // window.setting.ajaxInterceptor_rules[this.props.index].overrideTxt = txt;
-    // this.props.set('ajaxInterceptor_rules', window.setting.ajaxInterceptor_rules);
+    this.props.set('overrideTxt', txt)
   }
 
   handleJSONEditorChange = ({updated_src: src}) => {
     let txt = JSON.stringify(src);
     this.setState({txt, src});
-
-    // window.setting.ajaxInterceptor_rules[this.props.index].overrideTxt = txt;
-    // this.props.set('ajaxInterceptor_rules', window.setting.ajaxInterceptor_rules);
+    // 更新缓存
+    this.props.set('overrideTxt', txt)
   }
 
   handleEditorSwitch = showJSONEditor => {

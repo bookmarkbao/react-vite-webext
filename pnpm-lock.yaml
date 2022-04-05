@@ -33,6 +33,7 @@ specifiers:
   kolorist: ^1.5.0
   less: ^3.9.0
   less-loader: ^4.1.0
+  moment: ^2.29.2
   npm-run-all: ^4.1.5
   postcss-loader: ^3.0.0
   react: ^17.0.2
@@ -59,6 +60,7 @@ dependencies:
   css-loader: 2.1.1
   less: 3.13.1
   less-loader: 4.1.0_less@3.13.1
+  moment: 2.29.2
   postcss-loader: 3.0.0
   react: 17.0.2
   react-dom: 17.0.2_react@17.0.2
@@ -999,7 +1001,7 @@ packages:
       copy-to-clipboard: 3.3.1
       lodash: 4.17.21
       memoize-one: 6.0.0
-      moment: 2.29.1
+      moment: 2.29.2
       rc-cascader: 3.2.9_react-dom@17.0.2+react@17.0.2
       rc-checkbox: 2.3.2_react-dom@17.0.2+react@17.0.2
       rc-collapse: 3.1.2_react-dom@17.0.2+react@17.0.2
@@ -1338,7 +1340,7 @@ packages:
     hasBin: true
     optionalDependencies:
       dtrace-provider: 0.8.8
-      moment: 2.29.1
+      moment: 2.29.2
       mv: 2.1.1
       safe-json-stringify: 1.2.0
     dev: true
@@ -4202,9 +4204,8 @@ packages:
     hasBin: true
     dev: true
 
-  /moment/2.29.1:
-    resolution: {integrity: sha512-kHmoybcPV8Sqy59DwNDY3Jefr64lK/by/da0ViFcuA4DH0vQg5Q6Ze5VimxkfQNSC+Mls/Kx53s7TjP1RhFEDQ==}
-    requiresBuild: true
+  /moment/2.29.2:
+    resolution: {integrity: sha512-UgzG4rvxYpN15jgCmVJwac49h9ly9NurikMWGPdVxm8GZD6XjkKPxDTjQQ43gtGgnV3X0cAyWDdP2Wexoquifg==}
 
   /ms/2.0.0:
     resolution: {integrity: sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=}
@@ -5131,7 +5132,7 @@ packages:
       classnames: 2.3.1
       date-fns: 2.28.0
       dayjs: 1.11.0
-      moment: 2.29.1
+      moment: 2.29.2
       rc-trigger: 5.2.11_react-dom@17.0.2+react@17.0.2
       rc-util: 5.19.3_react-dom@17.0.2+react@17.0.2
       react: 17.0.2

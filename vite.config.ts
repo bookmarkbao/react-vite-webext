@@ -3,7 +3,7 @@
  * @Author: xiangjun02
  * @Date: 2022-04-01 22:48:45
  * @LastEditors: xiangjun02
- * @LastEditTime: 2022-04-02 00:39:20
+ * @LastEditTime: 2022-04-05 20:59:06
  */
 import { dirname, relative } from "path";
 import { defineConfig, UserConfig } from "vite";
@@ -94,6 +94,7 @@ export default defineConfig(({ command }) => ({
         background: r("src/background/index.html"),
         options: r("src/options/index.html"),
         popup: r("src/popup/index.html"),
+        views: r("src/views/index.html"),
       },
     },
   },

@@ -3,7 +3,7 @@
  * @Author: xiangjun02
  * @Date: 2022-04-01 22:48:45
  * @LastEditors: xiangjun02
- * @LastEditTime: 2022-04-05 14:46:06
+ * @LastEditTime: 2022-04-05 17:14:00
  */
 /* eslint-disable no-console */
 import React, { useEffect, useState } from "react";
@@ -51,7 +51,7 @@ import "./style.css";
     }
   });
   const AppMain = () => {
-    const [show, setShow] = useState(true);
+    const [show, setShow] = useState(false);
     window.setToggleIframe = () => setShow(!show); // 永远是最新的
     return (
       <>

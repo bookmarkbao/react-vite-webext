@@ -3,7 +3,7 @@
  * @Author: xiangjun02
  * @Date: 2022-04-01 22:48:45
  * @LastEditors: xiangjun02
- * @LastEditTime: 2022-04-05 17:14:00
+ * @LastEditTime: 2022-04-05 21:35:57
  */
 /* eslint-disable no-console */
 import React, { useEffect, useState } from "react";
@@ -12,6 +12,9 @@ import { onMessage } from "webext-bridge";
 import browser from "webextension-polyfill";
 import { ContentApp } from "./views/ContentApp";
 import { ContentIframe } from "./views/ContentIframe";
+
+// 执行代码注入
+import './views/ajaxInterceptor'
 
 // import ContentApp from './views/Main'
 // import ContentApp from './views/MainApp'

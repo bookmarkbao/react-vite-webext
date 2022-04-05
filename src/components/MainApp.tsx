@@ -31,6 +31,22 @@ export const MainApp = () => {
       setting,
     });
   };
+  const set = (key, value) => {
+    console.log(`chrome.runtime.id`, chrome.runtime.id);
+    console.log(`chrome.runtime.sendMessage`, chrome.runtime.sendMessage);
+    console.log(`key => value`, key, value);
+    try {
+      chrome.runtime.sendMessage(chrome.runtime.id, {
+        type: "ajaxInterceptor",
+        to: "background",
+        key,
+        value,
+      });
+    } catch (error) {
+      console.log("set >> ", error);
+    }
+    // chrome.storage && chrome.storage.local.set({ [key]: value });
+  };
   const getTodoNew = async (key) => {
     if (!chrome.storage) {
       console.log("不支持");
@@ -44,31 +60,41 @@ export const MainApp = () => {
       }
     );
   };
+  // 同步和更新
   const handleKeyDown = () => {};
-  const handleLabelChange = (e, i) => {
-    settings.ajaxInterceptor_rules[i].label = e.target.value;
+
+  // 性能优化：内容编辑上
+  let forceUpdateTimeout = null;
+  const forceUpdateDebouce = () => {
+    clearTimeout(forceUpdateTimeout);
+    forceUpdateTimeout = setTimeout(() => {
+      this.forceUpdate();
+    }, 1000);
+  };
+
+  const handleCommonChange = (keyName, value, i) => {
+    const ajaxInterceptor_rules = JSON.parse(
+      JSON.stringify(settings.ajaxInterceptor_rules)
+    );
+    ajaxInterceptor_rules[i][keyName] = value;
     setSettings((prevState) => ({
       ...prevState,
+      ajaxInterceptor_rules,
     }));
+    set("ajaxInterceptor_rules", ajaxInterceptor_rules);
+  };
+  const handleLabelChange = (e, i) => {
+    handleCommonChange("label", e.target.value, i);
   };
   const handleFilterTypeChange = (val, i) => {
-    settings.ajaxInterceptor_rules[i].filterType = val;
-    // 因为引用相同，所有深层修改，只需更新state即可
-    setSettings((prevState) => ({
-      ...prevState,
-    }));
+    handleCommonChange("filterType", val, i);
   };
   const handleMatchChange = (e, i) => {
-    settings.ajaxInterceptor_rules[i].match = e.target.value;
-    setSettings((prevState) => ({
-      ...prevState,
-    }));
+    handleCommonChange("match", e.target.value, i);
   };
   const handleSingleSwitchChange = (switchOn, i) => {
-    settings.ajaxInterceptor_rules[i].switchOn = switchOn;
-    setSettings((prevState) => ({
-      ...prevState,
-    }));
+    console.log('handleSingleSwitchChange',switchOn)
+    handleCommonChange("switchOn", switchOn, i);
   };
   const handleClickRemove = (e, i) => {
     e.stopPropagation();
@@ -78,19 +104,19 @@ export const MainApp = () => {
     }));
   };
   const updateAddBtnTop = () => {
-    console.log('updateAddBtnTop', 99999)
+    console.log("updateAddBtnTop", 99999);
   };
   const onChangeReplace = (key, value, item, index) => {
     settings.ajaxInterceptor_rules[index] = {
       ...item,
-      [key]: value
-    }
+      [key]: value,
+    };
     // console.log({
     //   ...item,
     //   key: value
     // })
     // console.log("onChangeReplace", key, value, item, index);
-    setSettings((prevState) => ({...prevState}))
+    setSettings((prevState) => ({ ...prevState }));
   };
 
   const renderPanelHeader = (item, index) => {
@@ -142,7 +168,7 @@ export const MainApp = () => {
               style={{ marginLeft: "10px", marginRight: "10px" }}
               size="small"
               defaultChecked={switchOn}
-              onChange={(val) => handleSingleSwitchChange(item, index)}
+              onChange={(val) => handleSingleSwitchChange(val, index)}
             />
             <MinusCircleOutlined
               onClick={(e) => handleClickRemove(e, index)}
@@ -155,7 +181,7 @@ export const MainApp = () => {
           defaultValue={overrideTxt}
           updateAddBtnTop={updateAddBtnTop}
           index={index}
-          set={(key, value)=>(onChangeReplace(key, value, item, index))}
+          set={(key, value) => onChangeReplace(key, value, item, index)}
         />
         {/* {this.state.interceptedRequests[match] && (
           <>

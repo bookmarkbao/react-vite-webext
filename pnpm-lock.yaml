@@ -15,6 +15,7 @@ specifiers:
   antd: ^4.16.13
   babel-polyfill: ^6.26.0
   chokidar: ^3.5.2
+  classnames: ^2.3.1
   cross-env: ^7.0.3
   crx: ^5.0.1
   css-loader: ^2.1.1
@@ -37,6 +38,7 @@ specifiers:
   react: ^17.0.2
   react-dom: ^17.0.2
   react-json-view: ^1.19.1
+  react-resize-panel: ^0.3.5
   rimraf: ^3.0.2
   style-loader: ^0.23.1
   svg-loader: 0.0.2
@@ -53,6 +55,7 @@ dependencies:
   '@ant-design/icons': 4.7.0_react-dom@17.0.2+react@17.0.2
   antd: 4.19.5_react-dom@17.0.2+react@17.0.2
   babel-polyfill: 6.26.0
+  classnames: 2.3.1
   css-loader: 2.1.1
   less: 3.13.1
   less-loader: 4.1.0_less@3.13.1
@@ -60,6 +63,7 @@ dependencies:
   react: 17.0.2
   react-dom: 17.0.2_react@17.0.2
   react-json-view: 1.21.3_b5d7bf22a7b46dd4876f0e926ab0c987
+  react-resize-panel: 0.3.5_react-dom@17.0.2+react@17.0.2
   style-loader: 0.23.1
   svg-loader: 0.0.2
   use-chrome-storage: 1.0.6_react@17.0.2
@@ -1400,6 +1404,10 @@ packages:
     resolution: {integrity: sha1-G2gcIf+EAzyCZUMJBolCDRhxUdw=}
     dev: true
 
+  /cash-dom/4.1.5:
+    resolution: {integrity: sha512-E6MO0A6ms5iZPtexznQXWRkFEvqdPqCmdx/SiJr2PnhOQNhZNfALkLG5t83Hk3J5JELzED7PJuzhMoS2tT64XA==}
+    dev: false
+
   /chalk/2.4.2:
     resolution: {integrity: sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==}
     engines: {node: '>=4'}
@@ -1499,6 +1507,11 @@ packages:
   /clone/2.1.2:
     resolution: {integrity: sha1-G39Ln1kfHo+DZwQBYANFoCiHQ18=}
     engines: {node: '>=0.8'}
+    dev: false
+
+  /clsx/1.1.1:
+    resolution: {integrity: sha512-6/bPho624p3S2pMyvP5kKBPXnI3ufHLObBFCfgx+LkeR5lg2XYy2hqZqUf45ypD8COn2bhgGJSUE+l5dhNBieA==}
+    engines: {node: '>=6'}
     dev: false
 
   /color-convert/1.9.3:
@@ -3965,6 +3978,10 @@ packages:
     resolution: {integrity: sha1-JI42By7ekGUB11lmIAqG2riyMXA=}
     dev: false
 
+  /lodash.debounce/4.0.8:
+    resolution: {integrity: sha1-gteb/zCmfEAF/9XiUVMArZyk168=}
+    dev: false
+
   /lodash.defaults/4.2.0:
     resolution: {integrity: sha1-0JF4cW/+pN3p5ft7N/bwgCJ0WAw=}
     dev: true
@@ -4807,7 +4824,6 @@ packages:
       loose-envify: 1.4.0
       object-assign: 4.1.1
       react-is: 16.13.1
-    dev: true
 
   /protocol-buffers-schema/3.6.0:
     resolution: {integrity: sha512-TdDRD+/QNdrCGCE7v8340QyuXd4kIWIgapsE2+n/SaGiSSbomYl4TjHlvIoCWRpE7wFt02EpB35VVA2ImcBVqw==}
@@ -5402,6 +5418,18 @@ packages:
       scheduler: 0.20.2
     dev: false
 
+  /react-draggable/4.4.4_react-dom@17.0.2+react@17.0.2:
+    resolution: {integrity: sha512-6e0WdcNLwpBx/YIDpoyd2Xb04PB0elrDrulKUgdrIlwuYvxh5Ok9M+F8cljm8kPXXs43PmMzek9RrB1b7mLMqA==}
+    peerDependencies:
+      react: '>= 16.3.0'
+      react-dom: '>= 16.3.0'
+    dependencies:
+      clsx: 1.1.1
+      prop-types: 15.8.1
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
+    dev: false
+
   /react-is/16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
@@ -5430,6 +5458,20 @@ packages:
     resolution: {integrity: sha512-F27qZr8uUqwhWZboondsPx8tnC3Ct3SxZA3V5WyEvujRyyNv0VYPhoBg1gZ8/MV5tubQp76Trw8lTv9hzRBa+A==}
     engines: {node: '>=0.10.0'}
     dev: true
+
+  /react-resize-panel/0.3.5_react-dom@17.0.2+react@17.0.2:
+    resolution: {integrity: sha512-iyHOFTrSt+WV4Ilzi81x6KH3FU7VsGP736rmxepwGrgAEATmCvXzZdluTm3NpsptP7aC3hLODmXwnxusyA393A==}
+    peerDependencies:
+      react: ^16.0.0
+      react-dom: ^16.0.0
+    dependencies:
+      cash-dom: 4.1.5
+      classnames: 2.3.1
+      lodash.debounce: 4.0.8
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
+      react-draggable: 4.4.4_react-dom@17.0.2+react@17.0.2
+    dev: false
 
   /react-textarea-autosize/8.3.3_03a98942b76c57740a9573edba2d1cc1:
     resolution: {integrity: sha512-2XlHXK2TDxS6vbQaoPbMOfQ8GK7+irc2fVK6QFIcC8GOnH3zI/v481n+j1L0WaPVvKxwesnY93fEfH++sus2rQ==}

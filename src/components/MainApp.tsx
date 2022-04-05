@@ -2,18 +2,23 @@ import React from "react";
 import { Switch, Collapse, Button, Input, Select } from "antd";
 import { MinusCircleOutlined } from "@ant-design/icons";
 import Replacer from "~/components/Replacer";
-import { useSettingsStore } from "./useSettingsStore.ts";
+import { useSettingsStore, ajaxInterceptor_rules } from "./useSettingsStore.ts";
 import { toggleIframe } from "~/logic/utils";
 import "./Main.less";
 const { Option } = Select;
 const Panel = Collapse.Panel;
 
 // if you need to state be preserved in `chrome.storage.sync` use useChromeStorageSync
-
 export const MainApp = () => {
   const [settings, setSettings, isPersistent, error] = useSettingsStore();
-  console.log("MainApp => before", settings, isPersistent);
-  // console.log("MainApp => after",settings, isPersistent)
+  settings.init &&
+    setSettings((prevState) => {
+      return {
+        ...prevState,
+        init: false,
+        ajaxInterceptor_rules,
+      };
+    });
   const saveTodo = async ({ key, value }) => {
     if (!chrome.storage) {
       console.log("不支持");
@@ -39,41 +44,38 @@ export const MainApp = () => {
       }
     );
   };
-  const getTodo = async () => {
-    // 'devtools' | 'background' | 'popup' | 'options' | 'content-script' | 'window'
-    const key = "test9999";
-    const value = "xiangjun999";
-    chrome.runtime.sendMessage(
-      chrome.runtime.id,
-      {
-        type: "ajaxInterceptor",
-        to: "background",
-        key,
-        value,
-      },
-      (result) => {
-        console.log("result 8888 >", result);
-      }
-    );
-  };
   const handleKeyDown = () => {};
   const handleLabelChange = (e, i) => {
-    const ajaxInterceptor_rules = settings.ajaxInterceptor_rules;
-    ajaxInterceptor_rules[i].label = e.target.value;
-    console.log(9999, ajaxInterceptor_rules);
+    settings.ajaxInterceptor_rules[i].label = e.target.value;
     setSettings((prevState) => ({
       ...prevState,
-      ajaxInterceptor_rules,
     }));
   };
-  const handleFilterTypeChange = (e, i) => {
-    console.log(e, i);
+  const handleFilterTypeChange = (val, i) => {
+    settings.ajaxInterceptor_rules[i].filterType = val;
+    // 因为引用相同，所有深层修改，只需更新state即可
+    setSettings((prevState) => ({
+      ...prevState,
+    }));
   };
   const handleMatchChange = (e, i) => {
-    console.log(e, i);
+    settings.ajaxInterceptor_rules[i].match = e.target.value;
+    setSettings((prevState) => ({
+      ...prevState,
+    }));
   };
-  const handleSingleSwitchChange = (e, i) => {
-    console.log(e, i);
+  const handleSingleSwitchChange = (switchOn, i) => {
+    settings.ajaxInterceptor_rules[i].switchOn = switchOn;
+    setSettings((prevState) => ({
+      ...prevState,
+    }));
+  };
+  const handleClickRemove = (e, i) => {
+    e.stopPropagation();
+    settings.ajaxInterceptor_rules.splice(i, 1);
+    setSettings((prevState) => ({
+      ...prevState,
+    }));
   };
   const updateAddBtnTop = () => {};
   const onChangeReplace = (val, val2) => {
@@ -122,16 +124,19 @@ export const MainApp = () => {
                 style={{ flex: 1 }}
                 defaultValue={match}
                 // onClick={e => e.stopPropagation()}
-                onChange={(e) => handleMatchChange(e, i)}
+                onChange={(e) => handleMatchChange(e, index)}
               />
             </Input.Group>
             <Switch
               style={{ marginLeft: "10px", marginRight: "10px" }}
               size="small"
               defaultChecked={switchOn}
-              onChange={(val) => handleSingleSwitchChange(val, index)}
+              onChange={(val) => handleSingleSwitchChange(item, index)}
             />
-            <MinusCircleOutlined style={{ fontSize: "18px", color: "#08c" }} />
+            <MinusCircleOutlined
+              onClick={(e) => handleClickRemove(e, index)}
+              style={{ fontSize: "18px", color: "#08c" }}
+            />
           </div>
         }
       >
@@ -167,9 +172,6 @@ export const MainApp = () => {
       </Panel>
     );
   };
-  const callback = () => {
-    console.log(1234);
-  };
   const saveToBackgound = (key) => {
     switch (key) {
       case "save":
@@ -189,7 +191,7 @@ export const MainApp = () => {
   };
   const renderContent = () => {
     return (
-      <Collapse defaultActiveKey={["1"]} onChange={callback()}>
+      <Collapse defaultActiveKey={["1"]} onChange={() => ({})}>
         {settings.ajaxInterceptor_rules.map((item, index) =>
           renderPanelHeader(item, index)
         )}
@@ -232,6 +234,17 @@ export const MainApp = () => {
       <Button type="danger" onClick={() => saveToBackgound("get")}>
         数据从后台获取
       </Button>
+      <Switch
+        style={{ marginLeft: "10px", marginRight: "10px" }}
+        size="small"
+        defaultChecked={setSettings.init}
+        onChange={(val) =>
+          setSettings((prevState) => ({
+            ...prevState,
+            init: true,
+          }))
+        }
+      />
     </div>
   );
 };

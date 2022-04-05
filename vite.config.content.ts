@@ -1,3 +1,10 @@
+/*
+ * @Descripttion: 
+ * @Author: xiangjun02
+ * @Date: 2022-04-01 22:48:45
+ * @LastEditors: xiangjun02
+ * @LastEditTime: 2022-04-05 13:26:57
+ */
 import { defineConfig } from "vite";
 import { sharedConfig } from "./vite.config";
 import { r, isDev } from "./scripts/utils";
@@ -9,7 +16,7 @@ export default defineConfig({
   build: {
     watch: isDev
       ? {
-          include: [r("src/contentScripts/**/*"), r("src/components/**/*")],
+          include: [r("src/contentScripts/**/*"), r("src/components/**/*"),r("src/logic/**/*")],
         }
       : undefined,
     outDir: r("extension/dist/contentScripts"),

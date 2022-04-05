@@ -1,19 +1,21 @@
 /*
- * @Descripttion: 
+ * @Descripttion:
  * @Author: xiangjun02
  * @Date: 2022-04-01 22:48:45
  * @LastEditors: xiangjun02
- * @LastEditTime: 2022-04-04 12:33:49
+ * @LastEditTime: 2022-04-05 14:46:06
  */
 /* eslint-disable no-console */
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { onMessage } from "webext-bridge";
 import browser from "webextension-polyfill";
 import { ContentApp } from "./views/ContentApp";
+import { ContentIframe } from "./views/ContentIframe";
+
 // import ContentApp from './views/Main'
 // import ContentApp from './views/MainApp'
-import './style.css'
+import "./style.css";
 
 // Firefox `browser.tabs.executeScript()` requires scripts return a primitive value
 (() => {
@@ -42,11 +44,28 @@ import './style.css'
   shadowDOM.appendChild(styleEl);
   shadowDOM.appendChild(root);
   document.body.appendChild(container);
+  // 接收来自iframe的触发
+  chrome.runtime.onMessage.addListener((msg, sender) => {
+    if (msg === "toggle") {
+      window.setToggleIframe && window.setToggleIframe();
+    }
+  });
+  const AppMain = () => {
+    const [show, setShow] = useState(true);
+    window.setToggleIframe = () => setShow(!show); // 永远是最新的
+    return (
+      <>
+        <ContentIframe show={show} />
+        <ContentApp onToggle={() => setShow(!show)} />
+      </>
+    );
+  };
 
   ReactDOM.render(
     <React.StrictMode>
-      <ContentApp />
+      <AppMain />
     </React.StrictMode>,
     root
   );
 })();
+

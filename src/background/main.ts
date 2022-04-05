@@ -3,7 +3,7 @@
  * @Author: xiangjun02
  * @Date: 2022-04-04 00:51:12
  * @LastEditors: xiangjun02
- * @LastEditTime: 2022-04-04 19:04:08
+ * @LastEditTime: 2022-04-04 19:24:01
  */
 import { sendMessage, onMessage } from "webext-bridge";
 import { Tabs } from "webextension-polyfill";
@@ -56,10 +56,10 @@ browser.tabs.onActivated.addListener(async ({ tabId }) => {
 });
 
 // sendMessage("get-todo-content", { title: tab.title }, { context: "content-script", tabId });
-// onMessage("get-todo", async () => {
-//   console.log("background >> get-todo");
-//   return { code: "ok", msg: "保存成功", data: "get-todo >> onMessage" };
-// });
+onMessage("get-todo", async () => {
+  console.log("background >> get-todo");
+  return { code: "ok", msg: "保存成功", data: "get-todo >> onMessage" };
+});
 
 // onMessage("get-current-tab", async () => {
 //   try {
@@ -79,7 +79,23 @@ browser.tabs.onActivated.addListener(async ({ tabId }) => {
 // chrome.runtime.onMessage.addListener((msg, sender, callback) => {
 browser.runtime.onMessage.addListener((msg, sender, callback) => {
   console.log('chrome.runtime.onMessage.addListener >>> ',msg)
-  callback && callback('99999999999999')
+  // 获取值
+  chrome.storage.local.get(['ajaxInterceptor_switchOn', 'ajaxInterceptor_rules'], (result) => {
+    if (result.hasOwnProperty('ajaxInterceptor_switchOn')) {
+      callback && callback('ajaxInterceptor_switchOn')
+      // if (result.ajaxInterceptor_switchOn) {
+      //   chrome.browserAction.setIcon({path: "/images/16.png"});
+      // } else {
+      //   chrome.browserAction.setIcon({path: "/images/16_gray.png"});
+      // }
+    } else {
+      callback && callback('nothing')
+    }
+  });
+  // 转发回当前的content
+  // chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+  //     chrome.tabs.sendMessage(tabs[0].id, {...msg, to: 'content'});
+  // })
   // if (msg.type === 'ajaxInterceptor' && msg.to === 'background') {
   //   if (msg.key === 'ajaxInterceptor_switchOn') {
   //     if (msg.value === true) {

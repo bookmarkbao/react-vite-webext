@@ -1,17 +1,24 @@
 
+const isDebug = true
 function log(){
-  console.log(...arguments)
+  isDebug && console.log(...arguments)
 }
+
+let reqApiResult = []
+
 // 命名空间
 let ajax_interceptor_qoweifjqon = {
   settings: {
-    ajaxInterceptor_switchOn: true,
+    ajaxInterceptor_switchOn: false,
     ajaxInterceptor_rules: [],
   },
   originalXHR: window.XMLHttpRequest,
   myXHR: function() {
     let pageScriptEventDispatched = false;
     const modifyResponse = () => {
+      reqApiResult.push({
+        responseText: this.responseText
+      })
       ajax_interceptor_qoweifjqon.settings.ajaxInterceptor_rules.forEach(({filterType = 'normal', switchOn = true, match, overrideTxt = ''}) => {
         let matched = false;
         log('myXHR modifyResponse >> ', this.responseURL, match)
@@ -22,10 +29,15 @@ let ajax_interceptor_qoweifjqon = {
             matched = true;
           }
         }
+
+        
         if (matched) {
-          this.responseText = overrideTxt;
-          this.response = overrideTxt;
-          
+          log('改前请求结果 onreadystatechange modifyResponse>>>responseText', this.responseText)
+          log('改前请求结果 onreadystatechange modifyResponse>>>response', this.response)
+          // this.responseText = overrideTxt;
+          // this.response = overrideTxt;
+          log('修改请求结果 onreadystatechange modifyResponse>>>responseText', overrideTxt)
+          log('修改请求结果 onreadystatechange modifyResponse>>>response', overrideTxt)
           if (!pageScriptEventDispatched) {
             window.dispatchEvent(new CustomEvent("pageScript", {
               detail: {url: this.responseURL, match}
@@ -40,9 +52,10 @@ let ajax_interceptor_qoweifjqon = {
     for (let attr in xhr) {
       if (attr === 'onreadystatechange') {
         xhr.onreadystatechange = (...args) => {
-          if (this.readyState == 4) {
+          if (this.readyState === 4) {
             // 请求成功
             if (ajax_interceptor_qoweifjqon.settings.ajaxInterceptor_switchOn) {
+             
               // 开启拦截
               modifyResponse();
             }
@@ -68,7 +81,7 @@ let ajax_interceptor_qoweifjqon = {
         // responseText和response不是writeable的，但拦截时需要修改它，所以修改就存储在this[`_${attr}`]上
         if (attr === 'responseText' || attr === 'response') {
           Object.defineProperty(this, attr, {
-            get: () => this[`_${attr}`] == undefined ? xhr[attr] : this[`_${attr}`],
+            get: () => this[`_${attr}`] === undefined ? xhr[attr] : this[`_${attr}`],
             set: (val) => this[`_${attr}`] = val,
             enumerable: true
           });
@@ -81,6 +94,7 @@ let ajax_interceptor_qoweifjqon = {
         }
       }
     }
+    console.log('myXHR================================', xhr)
   },
 
   originalFetch: window.fetch.bind(window),
@@ -89,7 +103,7 @@ let ajax_interceptor_qoweifjqon = {
       let txt = undefined;
       ajax_interceptor_qoweifjqon.settings.ajaxInterceptor_rules.forEach(({filterType = 'normal', switchOn = true, match, overrideTxt = ''}) => {
         let matched = false;
-        // log('myFetch XMLHttpRequest >> ', response.url, match)
+        log('myFetch XMLHttpRequest >> ', response.url, match)
         // log('myFetch XMLHttpRequest matched>> ', response.url.indexOf(match) > -1)
         if (switchOn && match) {
           if (filterType === 'normal' && response.url.indexOf(match) > -1) {
@@ -108,7 +122,6 @@ let ajax_interceptor_qoweifjqon = {
           txt = overrideTxt;
         }
       });
-
       if (txt !== undefined) { // 走代理结果
         const stream = new ReadableStream({
           start(controller) {
@@ -137,6 +150,7 @@ let ajax_interceptor_qoweifjqon = {
               case 'body':
               case 'bodyUsed':
                 return response[name];
+              default:
             }
             return target[name];
           }
@@ -149,7 +163,10 @@ let ajax_interceptor_qoweifjqon = {
         }
         log('myFetch matched proxy>>', proxy)
         log('myFetch matched txt>>', newResponse)
-  
+
+        log('接口请求结果 response >>>', response)
+        log('代理请求结果 response >>>', proxy)
+        
         return proxy;
       } else {
         return response;
@@ -168,7 +185,6 @@ window.addEventListener("message", function(event) {
   if (data.type === 'ajaxInterceptor' && data.to === 'pageScript') {
     ajax_interceptor_qoweifjqon.settings[data.key] = data.value;
   }
-  console.log('xiangjun9999 =======')
   console.log('react-ajax-interceptor >> message', ajax_interceptor_qoweifjqon.settings)
 
   if (ajax_interceptor_qoweifjqon.settings.ajaxInterceptor_switchOn) {
@@ -186,22 +202,16 @@ window.addEventListener(
   "message",
   function (event) {
     const data = event.data;
-    console.log("react window.addEventListener >> message", data);
+    console.log("从background，iframe过来的信息，更新内容 >> message", data);
     if (data.type === "ajaxInterceptor" && data.to === "pageScript") {
       ajax_interceptor_qoweifjqon.settings[data.key] = data.value;
     }
-    console.log("ajax_interceptor_qoweifjqon >>", ajax_interceptor_qoweifjqon);
-    window.xiangjun9999 = 'xiangjun9999'
     if (ajax_interceptor_qoweifjqon.settings.ajaxInterceptor_switchOn) {
-      console.log("myXHR > window.XMLHttpRequest", window.XMLHttpRequest);
-      console.log("myFetch > window.fetch", window.fetch);
       window.XMLHttpRequest = ajax_interceptor_qoweifjqon.myXHR;
       window.fetch = ajax_interceptor_qoweifjqon.myFetch;
     } else {
       window.XMLHttpRequest = ajax_interceptor_qoweifjqon.originalXHR;
       window.fetch = ajax_interceptor_qoweifjqon.originalFetch;
-      console.log("originalXHR > window.XMLHttpRequest", window.XMLHttpRequest);
-      console.log("originalFetch > window.fetch", window.fetch);
     }
   },
   false

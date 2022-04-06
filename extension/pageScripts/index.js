@@ -1,3 +1,10 @@
+/*
+ * @Descripttion: 这部分代码，相当于content代码
+ * @Author: xiangjun02
+ * @Date: 2022-04-06 02:51:03
+ * @LastEditors: xiangjun02
+ * @LastEditTime: 2022-04-06 10:20:52
+ */
 // 在页面上插入代码
 const script = document.createElement('script');
 script.setAttribute('type', 'text/javascript');
@@ -6,8 +13,11 @@ script.setAttribute('src', chrome.extension.getURL('pageScripts/main.js'));
 document.documentElement.appendChild(script);
 
 script.addEventListener('load', () => {
+  // 从content向网页发出的通信
   // eslint-disable-next-line no-undef
-  chrome.storage.local.get(['ajaxInterceptor_switchOn', 'ajaxInterceptor_rules'], (result) => {
+  chrome.storage.local.get(['settings','ajaxInterceptor_switchOn', 'ajaxInterceptor_rules'], (resultObj) => {
+    const result = resultObj.settings || {}
+    console.log('script.addEventListener>>>load', result);
     if (result.hasOwnProperty('ajaxInterceptor_switchOn')) {
       postMessage({type: 'ajaxInterceptor', to: 'pageScript', key: 'ajaxInterceptor_switchOn', value: result.ajaxInterceptor_switchOn});
     }
@@ -22,6 +32,7 @@ script.addEventListener('load', () => {
 // ============ 以下为content内容 ============
 let iframeLoaded = false;
 // 接收background.js传来的信息，转发给pageScript
+// eslint-disable-next-line no-undef
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg.type === "ajaxInterceptor" && msg.to === "content") {
     if (msg.hasOwnProperty("iframeScriptLoaded")) {
@@ -37,6 +48,7 @@ window.addEventListener(
   "pageScript",
   function (event) {
     if (iframeLoaded) {
+      // eslint-disable-next-line no-undef
       chrome.runtime.sendMessage({
         type: "ajaxInterceptor",
         to: "iframe",
@@ -47,6 +59,7 @@ window.addEventListener(
       const checktLoadedInterval = setInterval(() => {
         if (iframeLoaded) {
           clearInterval(checktLoadedInterval);
+          // eslint-disable-next-line no-undef
           chrome.runtime.sendMessage({
             type: "ajaxInterceptor",
             to: "iframe",

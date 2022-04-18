@@ -3,15 +3,14 @@
  * @Author: xiangjun02
  * @Date: 2022-04-06 02:51:03
  * @LastEditors: xiangjun02
- * @LastEditTime: 2022-04-06 10:20:52
+ * @LastEditTime: 2022-04-19 00:34:35
  */
 // 在页面上插入代码
 const script = document.createElement('script');
 script.setAttribute('type', 'text/javascript');
 // eslint-disable-next-line no-undef
-script.setAttribute('src', chrome.extension.getURL('pageScripts/main.js'));
+script.setAttribute('src', chrome.extension.getURL('pageScriptsInject/main.js'));
 document.documentElement.appendChild(script);
-
 script.addEventListener('load', () => {
   // 从content向网页发出的通信
   // eslint-disable-next-line no-undef
@@ -74,3 +73,5 @@ window.addEventListener(
   },
   false
 );
+
+window.love = '123456love'

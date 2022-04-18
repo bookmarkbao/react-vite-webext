@@ -1,3 +1,10 @@
+/*
+ * @Descripttion: 
+ * @Author: xiangjun02
+ * @Date: 2022-04-06 17:25:25
+ * @LastEditors: xiangjun02
+ * @LastEditTime: 2022-04-18 20:54:37
+ */
 // generate stub index.html files for dev entry
 import { execSync } from "child_process";
 import fs from "fs-extra";
@@ -29,7 +36,15 @@ function writeManifest() {
   execSync("npx esno ./scripts/manifest.ts", { stdio: "inherit" });
 }
 
+function tsupScripts(){
+  // execSync("ls", { stdio: "inherit" });
+  execSync("rm -rf ./extension/pageScriptsInject/*.*")
+  execSync("tsup ./src/contentScriptsInject/*.ts -d ./extension/pageScriptsInject/", { stdio: "inherit" });
+  log("PRE", `src/contentScriptsInject/**.ts > contentScriptsInject/pageScriptsInject/**.js`);
+}
+
 writeManifest();
+tsupScripts();
 
 if (isDev) {
   stubIndexHtml();
@@ -38,5 +53,8 @@ if (isDev) {
   });
   chokidar.watch([r("src/manifest.ts"), r("package.json")]).on("change", () => {
     writeManifest();
+  });
+  chokidar.watch([r("src/contentScriptsInject/*.ts")]).on("change", () => {
+    tsupScripts();
   });
 }

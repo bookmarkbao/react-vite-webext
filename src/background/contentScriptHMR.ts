@@ -3,7 +3,7 @@
  * @Author: xiangjun02
  * @Date: 2022-04-04 00:26:09
  * @LastEditors: xiangjun02
- * @LastEditTime: 2022-04-06 02:30:48
+ * @LastEditTime: 2022-04-19 02:01:04
  */
 import { isFirefox, isForbiddenUrl } from "~/env";
 import browser from "webextension-polyfill";
@@ -17,9 +17,15 @@ browser.webNavigation.onCommitted.addListener(({ tabId, frameId, url }) => {
   if (isForbiddenUrl(url)) return;
 
   // inject the latest scripts
+  // browser.tabs
+  //   .executeScript(tabId, {
+  //     file: `${isFirefox ? "" : "."}/pageScripts/index.js`,
+  //     runAt: "document_end",
+  //   })
+  //   .catch((error) => console.error(error));
   browser.tabs
     .executeScript(tabId, {
-      file: `${isFirefox ? "" : "."}/pageScripts/index.js`,
+      file: `${isFirefox ? "" : "."}/pageScriptsInject/index.js`,
       runAt: "document_end",
     })
     .catch((error) => console.error(error));

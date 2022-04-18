@@ -3,7 +3,7 @@
  * @Author: xiangjun02
  * @Date: 2022-04-04 00:39:25
  * @LastEditors: xiangjun02
- * @LastEditTime: 2022-04-06 02:04:24
+ * @LastEditTime: 2022-04-19 01:16:04
  */
 import fs from 'fs-extra'
 import type { Manifest } from 'webextension-polyfill'
@@ -47,12 +47,14 @@ export async function getManifest() {
     ],
     content_scripts: [{
       matches: ['http://*/*', 'https://*/*'],
-      js: ['./pageScripts/index.js','./dist/contentScripts/index.global.js'],
+      js: ['./pageScriptsInject/index.js','./dist/contentScripts/index.global.js'],
     }],
     web_accessible_resources: [
       'dist/contentScripts/style.css',
       "dist/views/index.html",
-      "pageScripts/main.js"
+      "pageScripts/main.js",
+      "pageScripts/inject.js",
+      "pageScriptsInject/*.js"
     ],
   }
 

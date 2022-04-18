@@ -12,6 +12,7 @@ import { onMessage } from "webext-bridge";
 import browser from "webextension-polyfill";
 import { ContentApp } from "./views/ContentApp";
 import { ContentIframe } from "./views/ContentIframe";
+import './views/injectScript'
 
 // 执行代码注入
 // import './views/ajaxInterceptor'

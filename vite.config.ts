@@ -3,7 +3,7 @@
  * @Author: xiangjun02
  * @Date: 2022-04-01 22:48:45
  * @LastEditors: xiangjun02
- * @LastEditTime: 2022-04-05 20:59:06
+ * @LastEditTime: 2022-04-08 09:28:24
  */
 import { dirname, relative } from "path";
 import { defineConfig, UserConfig } from "vite";
@@ -71,7 +71,7 @@ export const sharedConfig: UserConfig = {
     }
   }
 };
-
+// 情景配置: dev/serve 或 build
 export default defineConfig(({ command }) => ({
   ...sharedConfig,
   base: command === "serve" ? `http://localhost:${port}/` : "/dist/",
@@ -82,14 +82,14 @@ export default defineConfig(({ command }) => ({
     },
   },
   build: {
-    outDir: r("extension/dist"),
-    emptyOutDir: false,
-    sourcemap: isDev ? "inline" : false,
+    outDir: r("extension/dist"), // 指定输出目录(相对于根目录)
+    emptyOutDir: false, // 清空目录，关闭警告
+    sourcemap: isDev ? "inline" : false, // 构建后是否生成 source map 文件
     // https://developer.chrome.com/docs/webstore/program_policies/#:~:text=Code%20Readability%20Requirements
-    terserOptions: {
-      mangle: false,
+    terserOptions: { // 用于 ES6+ 的 JavaScript mangler/compressor 工具包
+      mangle: false, // 是否混淆
     },
-    rollupOptions: {
+    rollupOptions: { // 自定义底层的 Rollup 打包配置。
       input: {
         background: r("src/background/index.html"),
         options: r("src/options/index.html"),

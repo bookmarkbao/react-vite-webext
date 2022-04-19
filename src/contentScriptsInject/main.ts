@@ -3,9 +3,17 @@ const isDebug = true
 function log(){
   isDebug && console.log(...arguments)
 }
-
+let counter = 0;
+function cLog(msg, action) {
+  switch (action) {
+    case "warning":
+      console.log(`%c ${counter++} >> ${msg}`, "color: blue;font-size: 24px;");
+      break;
+    default:
+      console.log(`%c ${counter++}>> ${msg}`, "color: blue;font-size: 24px;");
+  }
+}
 let reqApiResult = []
-
 // 命名空间
 let ajax_interceptor_qoweifjqon = {
   settings: {
@@ -19,25 +27,25 @@ let ajax_interceptor_qoweifjqon = {
       reqApiResult.push({
         responseText: this.responseText
       })
+
+      // 去配置中查找，是否有符合条件的路由
       ajax_interceptor_qoweifjqon.settings.ajaxInterceptor_rules.forEach(({filterType = 'normal', switchOn = true, match, overrideTxt = ''}) => {
         let matched = false;
-        log('myXHR modifyResponse >> ', this.responseURL, match)
+        // 全局switchOn打开 ， 存在配置match
         if (switchOn && match) {
+          // 判断filterType
           if (filterType === 'normal' && this.responseURL.indexOf(match) > -1) {
             matched = true;
           } else if (filterType === 'regex' && this.responseURL.match(new RegExp(match, 'i'))) {
             matched = true;
           }
         }
-
-        
+        cLog("匹配结果")
+        log("matched", matched)
+        // 如果匹配成功，则进行结果修改
         if (matched) {
-          log('改前请求结果 onreadystatechange modifyResponse>>>responseText', this.responseText)
-          log('改前请求结果 onreadystatechange modifyResponse>>>response', this.response)
-          // this.responseText = overrideTxt;
-          // this.response = overrideTxt;
-          log('修改请求结果 onreadystatechange modifyResponse>>>responseText', overrideTxt)
-          log('修改请求结果 onreadystatechange modifyResponse>>>response', overrideTxt)
+          this.responseText = overrideTxt;
+          this.response = overrideTxt;
           if (!pageScriptEventDispatched) {
             window.dispatchEvent(new CustomEvent("pageScript", {
               detail: {url: this.responseURL, match}
@@ -48,6 +56,7 @@ let ajax_interceptor_qoweifjqon = {
       })
     }
     
+    // 正常采用原生请求 = 请求成功之后，由modify决定是否替换
     const xhr = new ajax_interceptor_qoweifjqon.originalXHR;
     for (let attr in xhr) {
       if (attr === 'onreadystatechange') {
@@ -94,7 +103,7 @@ let ajax_interceptor_qoweifjqon = {
         }
       }
     }
-    console.log('myXHR================================', xhr)
+    // console.log('myXHR================================', xhr)
   },
 
   originalFetch: window.fetch.bind(window),
@@ -103,7 +112,8 @@ let ajax_interceptor_qoweifjqon = {
       let txt = undefined;
       ajax_interceptor_qoweifjqon.settings.ajaxInterceptor_rules.forEach(({filterType = 'normal', switchOn = true, match, overrideTxt = ''}) => {
         let matched = false;
-        log('myFetch XMLHttpRequest >> ', response.url, match)
+        // cLog('myFetch XMLHttpRequest >> ')
+        // log(response.url, match)
         // log('myFetch XMLHttpRequest matched>> ', response.url.indexOf(match) > -1)
         if (switchOn && match) {
           if (filterType === 'normal' && response.url.indexOf(match) > -1) {
@@ -117,8 +127,10 @@ let ajax_interceptor_qoweifjqon = {
           window.dispatchEvent(new CustomEvent("pageScript", {
             detail: {url: response.url, match}
           }));
-          log('myFetch matched pageScript>>',{url: response.url, match})
-          log('myFetch matched txt>>', JSON.parse(overrideTxt))
+          // cLog('myFetch matched pageScript>>');
+          // log({url: response.url, match})
+          // cLog('myFetch matched txt>>')
+          // log(JSON.parse(overrideTxt))
           txt = overrideTxt;
         }
       });
@@ -161,11 +173,11 @@ let ajax_interceptor_qoweifjqon = {
             proxy[key] = proxy[key].bind(newResponse);
           }
         }
-        log('myFetch matched proxy>>', proxy)
-        log('myFetch matched txt>>', newResponse)
+        // log('myFetch matched proxy>>', proxy)
+        // log('myFetch matched txt>>', newResponse)
 
-        log('接口请求结果 response >>>', response)
-        log('代理请求结果 response >>>', proxy)
+        // log('接口请求结果 response >>>', response)
+        // log('代理请求结果 response >>>', proxy)
         
         return proxy;
       } else {
@@ -180,7 +192,7 @@ window.addEventListener("message", function(event) {
   if (data.type === 'ajaxInterceptor' && data.to === 'pageScript') {
     ajax_interceptor_qoweifjqon.settings[data.key] = data.value;
   }
-  console.log('react-ajax-interceptor >> message', ajax_interceptor_qoweifjqon.settings)
+  // console.log('react-ajax-interceptor >> message', ajax_interceptor_qoweifjqon.settings)
 
   if (ajax_interceptor_qoweifjqon.settings.ajaxInterceptor_switchOn) {
     window.XMLHttpRequest = ajax_interceptor_qoweifjqon.myXHR;
@@ -197,7 +209,7 @@ window.addEventListener(
   "message",
   function (event) {
     const data = event.data;
-    console.log("从background，iframe过来的信息，更新内容 >> message", data);
+    // console.log("从background，iframe过来的信息，更新内容 >> message", data);
     if (data.type === "ajaxInterceptor" && data.to === "pageScript") {
       ajax_interceptor_qoweifjqon.settings[data.key] = data.value;
     }
@@ -211,5 +223,3 @@ window.addEventListener(
   },
   false
 );
-
-window.dx002 = 'dx002>main.js'

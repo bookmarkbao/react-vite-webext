@@ -3,7 +3,7 @@
  * @Author: xiangjun02
  * @Date: 2022-04-02 00:53:11
  * @LastEditors: xiangjun02
- * @LastEditTime: 2022-04-05 17:06:26
+ * @LastEditTime: 2022-04-20 00:51:47
  */
 import React, {Component} from 'react';
 import {Switch} from 'antd';
@@ -17,7 +17,10 @@ export default class Replacer extends Component {
     this.state = {
       showJSONEditor: false,
       txt: props.defaultValue,
+      placeholder: props.placeholder || '',
       src: null,
+      label: props.label || 'Replace With',
+      showLabel: props.showLabel === undefined
     }
 
     try {
@@ -68,12 +71,10 @@ export default class Replacer extends Component {
 
     return (
       <>
-        <div className="replace-with">
-          Replace With:
-        </div>
+        {this.state.showLabel && <div className="replace-with"> {this.state.label} </div>}
         <textarea
           className="overrideTxt"
-          // placeholder="replace with"
+          placeholder={this.state.placeholder}
           style={{resize: 'none'}}
           value={this.state.txt}
           onChange={e => this.handleOverrideTxtChange(e.target.value)}

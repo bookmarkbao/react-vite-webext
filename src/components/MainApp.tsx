@@ -1,45 +1,179 @@
-import React from "react";
-import { Switch, Collapse, Button, Input, Select } from "antd";
+import React, { useState, useEffect } from "react";
+import { Switch, Collapse, Button, Input, Select, Tooltip, Badge, Radio, message, Divider, Space, Popconfirm } from "antd";
 import { MinusCircleOutlined } from "@ant-design/icons";
 import Replacer from "~/components/Replacer";
-import { useSettingsStore } from "./useSettingsStore.ts";
-// import { useSettingsStore, ajaxInterceptor_rules } from "./useSettingsStore.ts";
+import * as types from "~/components/types";
 import { toggleIframe } from "~/logic/utils";
 import "./Main.less";
 const { Option } = Select;
+const { TextArea } = Input;
 const Panel = Collapse.Panel;
+
+const dateFormat = (fmt, date) => {
+  let ret;
+  const opt = {
+    "Y+": date.getFullYear().toString(), // 年
+    "m+": (date.getMonth() + 1).toString(), // 月
+    "d+": date.getDate().toString(), // 日
+    "H+": date.getHours().toString(), // 时
+    "M+": date.getMinutes().toString(), // 分
+    "s+": date.getSeconds().toString(), // 秒
+    // 有其他格式化字符需求可以继续添加，必须转化成字符串
+  };
+  for (let k in opt) {
+    ret = new RegExp("(" + k + ")").exec(fmt);
+    if (ret) {
+      fmt = fmt.replace(ret[1], ret[1].length == 1 ? opt[k] : opt[k].padStart(ret[1].length, "0"));
+    }
+  }
+  return fmt;
+};
+
+const ImportJson = (props) => {
+  const [overrideTxt, setOverrideText] = useState("");
+  const onChangeReplace = (key, value) => {
+    // console.log(key, value);
+    setOverrideText(value);
+  };
+  const updateAddBtnTop = () => {};
+
+  const saveAndReplaceContent = () => {
+    try {
+      const jsonData = JSON.parse(overrideTxt);
+      if (jsonData[types.INTERCEPTO_RULES] === undefined) {
+        message.error(`未配置${types.INTERCEPTO_RULES}参数，请检查`);
+        return;
+      }
+      if (jsonData[types.SWITCH_ON] === undefined) {
+        message.error(`未配置${types.SWITCH_ON}参数，请检查`);
+        return;
+      }
+      props.onSave(overrideTxt);
+    } catch (error) {
+      message.error("无效的JSON格式");
+    }
+  };
+  return (
+    <div style={{ padding: `20px 20px` }}>
+      <Button type="primary" onClick={saveAndReplaceContent}>
+        保存并替换当前配置
+      </Button>
+      <Replacer placeholder="请粘贴合规的JSON配置" showLabel={false} label="JSON配置" defaultValue={overrideTxt} updateAddBtnTop={updateAddBtnTop} set={(key, value) => onChangeReplace(key, value)} />
+    </div>
+  );
+};
 
 // if you need to state be preserved in `chrome.storage.sync` use useChromeStorageSync
 export const MainApp = () => {
-  const [settings, setSettings, isPersistent, error] = useSettingsStore();
-  // settings.init &&
-  //   setSettings((prevState) => {
-  //     return {
-  //       ...prevState,
-  //       init: false,
-  //       ajaxInterceptor_rules,
-  //     };
-  //   });
+  // const [settings, setSettings, isPersistent, error] = useSettingsStore();
+  const [interceptedRequests, setInterceptedRequests] = useState({});
+  const [ajaxInterceptorRules, setAjaxInterceptorRules] = useState([]);
+  const [ajaxInterceptorSwitchOn, setAjaxInterceptorSwitchOn] = useState(false);
+  const updateAddBtnTop = () => {
+    console.log("updateAddBtnTop", 99999);
+  };
+  const onChangeReplace = (key, value, item, index) => {
+    ajaxInterceptorRules[index] = {
+      ...item,
+      [key]: value,
+    };
+    forceUpdateDebouce(types.INTERCEPTO_RULES, ajaxInterceptorRules);
+  };
 
-  // 必须在这个之前，把数据同步过去
-  // chrome.runtime.sendMessage(chrome.runtime.id, { type: 'ajaxInterceptor', to: 'background', iframeScriptLoaded: true });
-
-  const saveTodo = async ({ key, value }) => {
+  // 保存数据. 如果value有值，则是key => value， 否则是对象
+  const saveChromeStorageLocal = (opt, value = undefined) => {
     if (!chrome.storage) {
       console.log("不支持");
       return false;
     }
-    chrome.storage.local.set({
-      [key]: value,
-      demo111: "demo111",
-      demo222: "demo222",
-      setting,
+    console.log(`数据更新`);
+    console.log(opt, value);
+    chrome.storage.local.set(value !== undefined ? { [opt]: value } : { ...opt });
+  };
+
+  const downloadJSON = (name) => {
+    const prefix = dateFormat("YYYY-mm-dd HH:MM:ss", new Date());
+    const data = JSON.stringify({
+      [types.INTERCEPTO_RULES]: ajaxInterceptorRules,
+      [types.SWITCH_ON]: ajaxInterceptorSwitchOn,
+    });
+    var urlObject = window.URL || window.webkitURL || window;
+    var export_blob = new Blob([data]);
+    var createA = document.createElementNS("http://www.w3.org/1999/xhtml", "a");
+    createA.href = urlObject.createObjectURL(export_blob);
+    createA.download = `${prefix}-${name}.json`;
+    var ev = document.createEvent("MouseEvents");
+    ev.initMouseEvent("click", true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+    createA.dispatchEvent(ev);
+  };
+
+  // 读取数据
+  const getChromeStorageLocal = () => {
+    return new Promise((resolve, reject) => {
+      if (!chrome.storage) {
+        reject(new Error("不支持"));
+      }
+      chrome.storage.local.get([types.SWITCH_ON, types.INTERCEPTO_RULES], (result) => {
+        resolve(result);
+      });
     });
   };
+
+  const setSettingsData = async (options = null) => {
+    const settings = options || (await getChromeStorageLocal());
+    // init: false, showAvatar: true, showHistory: false, ajaxInterceptor_switchOn: true, ajaxInterceptor_rules
+    const { init, showAvatar, showHistory, ajaxInterceptor_switchOn, ajaxInterceptor_rules } = settings;
+    // console.log(`ajaxInterceptor_rules`, ajaxInterceptor_rules);
+    setAjaxInterceptorRules(ajaxInterceptor_rules || []);
+    setAjaxInterceptorSwitchOn(ajaxInterceptor_switchOn);
+  };
+
+  // 性能优化：内容编辑上
+  let forceUpdateTimeout = null;
+  const forceUpdateDebouce = (key, value) => {
+    clearTimeout(forceUpdateTimeout);
+    forceUpdateTimeout = setTimeout(() => {
+      saveChromeStorageLocal(key, value);
+    }, 1000);
+  };
+
+  // useEffect(() => {
+  //    saveChromeStorageLocal(); //更新数据
+  // }, [ajaxInterceptorSwitchOn])
+
+  // 请求一次
+  useEffect(() => {
+    console.log(`useEffect 请求一次：`);
+    setSettingsData();
+  }, []);
+
+  const renderInterceptorInfo = (match) => {
+    return (
+      <>
+        <div className="intercepted-requests">Intercepted Requests:</div>
+        <div className="intercepted">
+          {interceptedRequests[match]?.map(({ url, num }) => (
+            <Tooltip placement="top" title={url} key={url}>
+              <Badge
+                count={num}
+                style={{
+                  backgroundColor: "#fff",
+                  color: "#999",
+                  boxShadow: "0 0 0 1px #d9d9d9 inset",
+                  marginTop: "-3px",
+                  marginRight: "4px",
+                }}
+              />
+              <span className="url">{url}</span>
+            </Tooltip>
+          ))}
+        </div>
+      </>
+    );
+  };
+
   const set = (key, value) => {
-    console.log(`chrome.runtime.id`, chrome.runtime.id);
-    console.log(`chrome.runtime.sendMessage`, chrome.runtime.sendMessage);
-    console.log(`key => value`, key, value);
+    // 数据同步过去
     try {
       chrome.runtime.sendMessage(chrome.runtime.id, {
         type: "ajaxInterceptor",
@@ -50,246 +184,148 @@ export const MainApp = () => {
     } catch (error) {
       console.log("set >> ", error);
     }
-    // chrome.storage && chrome.storage.local.set({ [key]: value });
   };
-  const getTodoNew = async (key) => {
-    if (!chrome.storage) {
-      console.log("不支持");
-      return false;
+
+  // ajaxInterceptor_rules下属性的修改
+  const handleCommonChange = (keyName, value, i, debounced = false) => {
+    ajaxInterceptorRules[i][keyName] = value;
+    // 编辑性能优化
+    if (debounced) {
+      forceUpdateDebouce(types.INTERCEPTO_RULES, ajaxInterceptorRules);
+    } else {
+      saveChromeStorageLocal(types.INTERCEPTO_RULES, ajaxInterceptorRules); //更新数据
     }
-    console.log("MainApp => getTodoNew", settings, isPersistent);
-    chrome.storage.local.get(
-      [key, "demo111", "demo333", "setting"],
-      (result) => {
-        console.log("getTodo>>", key, result);
-      }
-    );
-  };
-  // 同步和更新
-  const handleKeyDown = () => {};
-
-  // 性能优化：内容编辑上
-  let forceUpdateTimeout = null;
-  const forceUpdateDebouce = () => {
-    clearTimeout(forceUpdateTimeout);
-    forceUpdateTimeout = setTimeout(() => {
-      this.forceUpdate();
-    }, 1000);
-  };
-
-  const handleCommonChange = (keyName, value, i) => {
-    const ajaxInterceptor_rules = JSON.parse(
-      JSON.stringify(settings.ajaxInterceptor_rules)
-    );
-    ajaxInterceptor_rules[i][keyName] = value;
-    setSettings((prevState) => ({
-      ...prevState,
-      ajaxInterceptor_rules
-    }));
-    set("ajaxInterceptor_rules", ajaxInterceptor_rules);
-  };
-  const handleLabelChange = (e, i) => {
-    handleCommonChange("label", e.target.value, i);
-  };
-  const handleFilterTypeChange = (val, i) => {
-    handleCommonChange("filterType", val, i);
-  };
-  const handleMatchChange = (e, i) => {
-    handleCommonChange("match", e.target.value, i);
-  };
-  const handleSingleSwitchChange = (switchOn, i) => {
-    console.log('handleSingleSwitchChange',switchOn)
-    handleCommonChange("switchOn", switchOn, i);
-  };
-  const handleClickRemove = (e, i) => {
-    e.stopPropagation();
-    settings.ajaxInterceptor_rules.splice(i, 1);
-    setSettings((prevState) => ({
-      ...prevState,
-    }));
-  };
-  const updateAddBtnTop = () => {
-    console.log("updateAddBtnTop", 99999);
-  };
-  const onChangeReplace = (key, value, item, index) => {
-    settings.ajaxInterceptor_rules[index] = {
-      ...item,
-      [key]: value,
-    };
-    // console.log({
-    //   ...item,
-    //   key: value
-    // })
-    // console.log("onChangeReplace", key, value, item, index);
-    setSettings((prevState) => ({ ...prevState }));
   };
 
   const renderPanelHeader = (item, index) => {
-    const {
-      filterType = "normal",
-      match,
-      label,
-      overrideTxt,
-      switchOn = true,
-      key,
-    } = item;
+    const { filterType = "normal", match, label, overrideTxt, switchOn = true, key } = item;
     return (
       <Panel
         key={key}
         header={
-          <div
-            className="panel-header"
-            role="button"
-            onKeyDown={handleKeyDown}
-            tabIndex="0"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="panel-header" role="button" tabIndex="0" onClick={(e) => e.stopPropagation()}>
             <Input.Group compact style={{ flex: 1, display: "flex" }}>
-              <Input
-                placeholder="name"
-                style={{ width: "220px" }}
-                defaultValue={label}
-                onChange={(e) => handleLabelChange(e, index)}
-              />
-              <Select
-                defaultValue={filterType}
-                style={{ width: "120px" }}
-                onChange={(e) => handleFilterTypeChange(e, index)}
-              >
+              <Input placeholder="name" style={{ width: "220px" }} defaultValue={label} onChange={(e) => handleCommonChange("label", e.target.value, index)} />
+              <Select defaultValue={filterType} style={{ width: "120px" }} onChange={(e) => handleCommonChange("filterType", e, index, false)}>
                 <Option value="normal">normal</Option>
                 <Option value="regex">regex</Option>
               </Select>
               <Input
-                placeholder={
-                  filterType === "normal" ? "eg: abc/get" : "eg: abc.*"
-                }
+                placeholder={filterType === "normal" ? "eg: abc/get" : "eg: abc.*"}
                 style={{ flex: 1 }}
                 defaultValue={match}
                 // onClick={e => e.stopPropagation()}
-                onChange={(e) => handleMatchChange(e, index)}
+                onChange={(e) => handleCommonChange("match", e.target.value, index)}
               />
             </Input.Group>
-            <Switch
-              style={{ marginLeft: "10px", marginRight: "10px" }}
-              size="small"
-              defaultChecked={switchOn}
-              onChange={(val) => handleSingleSwitchChange(val, index)}
-            />
-            <MinusCircleOutlined
-              onClick={(e) => handleClickRemove(e, index)}
-              style={{ fontSize: "18px", color: "#08c" }}
-            />
+            <Switch style={{ marginLeft: "10px", marginRight: "10px" }} size="small" defaultChecked={switchOn} onChange={(val) => handleCommonChange("switchOn", val, index, false)} />
+            <Popconfirm placement="topLeft" title="确定删除吗？" onConfirm={()=>{
+               ajaxInterceptorRules.splice(index, 1);
+               setAjaxInterceptorRules([...ajaxInterceptorRules]);
+               saveChromeStorageLocal(types.INTERCEPTO_RULES, ajaxInterceptorRules);
+            }} okText="确定" cancelText="取消">
+                <MinusCircleOutlined style={{ fontSize: "18px", color: "#08c" }}/>
+            </Popconfirm>
           </div>
         }
       >
-        <Replacer
-          defaultValue={overrideTxt}
-          updateAddBtnTop={updateAddBtnTop}
-          index={index}
-          set={(key, value) => onChangeReplace(key, value, item, index)}
-        />
-        {/* {this.state.interceptedRequests[match] && (
-          <>
-            <div className="intercepted-requests">Intercepted Requests:</div>
-            <div className="intercepted">
-              {this.state.interceptedRequests[match] &&
-                this.state.interceptedRequests[match].map(({ url, num }) => (
-                  <Tooltip placement="top" title={url} key={url}>
-                    <Badge
-                      count={num}
-                      style={{
-                        backgroundColor: "#fff",
-                        color: "#999",
-                        boxShadow: "0 0 0 1px #d9d9d9 inset",
-                        marginTop: "-3px",
-                        marginRight: "4px",
-                      }}
-                    />
-                    <span className="url">{url}</span>
-                  </Tooltip>
-                ))}
-            </div>
-          </>
-        )} */}
+        <Replacer defaultValue={overrideTxt} updateAddBtnTop={updateAddBtnTop} index={index} set={(key, value) => onChangeReplace(key, value, item, index)} />
+        {renderInterceptorInfo(item, match)}
       </Panel>
     );
   };
-  const saveToBackgound = (key) => {
-    switch (key) {
-      case "save":
-        saveTodo({
-          key: "ajaxData",
-          value: "test9999",
-        });
-        console.log("saveToBackgound");
-        break;
-      case "get":
-        // this.getTodo();
-        getTodoNew("ajaxData");
-        console.log("getToBackgound");
-        break;
-      default:
-    }
+  const test = async () => {
+    const result = await getChromeStorageLocal();
+    console.log("test setting", result);
   };
   const renderContent = () => {
     return (
-      <Collapse defaultActiveKey={["1"]} onChange={() => ({})}>
-        {settings.ajaxInterceptor_rules.map((item, index) =>
-          renderPanelHeader(item, index)
-        )}
-      </Collapse>
+      <div style={{ padding: `0 20px` }}>
+        <Collapse defaultActiveKey={["1"]} onChange={() => ({})}>
+          {ajaxInterceptorRules.map((item, index) => renderPanelHeader(item, index))}
+        </Collapse>
+      </div>
     );
+  };
+
+  const buildUUID = () => {
+    var dt = new Date().getTime();
+    var uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+      var r = (dt + Math.random() * 16) % 16 | 0;
+      dt = Math.floor(dt / 16);
+      return (c == "x" ? r : (r & 0x3) | 0x8).toString(16);
+    });
+    return uuid;
+  };
+
+  const addItem = () => {
+    const arr = [...ajaxInterceptorRules];
+    arr.push({ match: "", label: `url${ajaxInterceptorRules.length + 1}`, switchOn: true, key: buildUUID() });
+    setAjaxInterceptorRules(arr);
+    saveChromeStorageLocal(types.INTERCEPTO_RULES, arr); // 更新数据
   };
   return (
     <div>
-      <Button type="danger" onClick={() => toggleIframe()}>
-        隐藏Iframe
-      </Button>
-
-      <Button
-        type="danger"
-        onClick={() =>
-          setSettings((prevState) => ({
-            ...prevState,
-            ajaxInterceptor_switchOn: false,
-          }))
-        }
+      <div
+        style={{
+          padding: `16px 16px`,
+          background: `rgb(190, 200, 200)`,
+        }}
       >
-        关闭
-      </Button>
+        <Space>
+          <Button size="small" circle type="primary" onClick={() => toggleIframe()}>
+            隐藏
+          </Button>
+          <Switch
+            checked={ajaxInterceptorSwitchOn}
+            defaultChecked={ajaxInterceptorSwitchOn}
+            checkedChildren="开启Ajax拦截"
+            unCheckedChildren="关闭Ajax拦截"
+            onChange={(val) => {
+              setAjaxInterceptorSwitchOn(val);
+              saveChromeStorageLocal(types.SWITCH_ON, val);
+            }}
+          />
+        </Space>
+      </div>
 
-      <Button
-        type="danger"
-        onClick={() =>
-          setSettings((prevState) => ({
-            ...prevState,
-            ajaxInterceptor_switchOn: true,
-          }))
-        }
-      >
-        开启
-      </Button>
-      {settings.ajaxInterceptor_switchOn && renderContent()}
-      <Button type="primary" onClick={() => saveToBackgound("save")}>
-        数据保存到后台
-      </Button>
-      <Button type="danger" onClick={() => saveToBackgound("get")}>
+      <Divider orientation="left">拦截接口配置</Divider>
+      {ajaxInterceptorSwitchOn && renderContent()}
+      <div style={{ padding: `20px 20px` }}>
+        <Space>
+          <Button type="primary" onClick={() => addItem()}>
+            新增
+          </Button>
+          <Button
+            type="primary"
+            onClick={() => {
+              downloadJSON("ajax-interceptor");
+            }}
+          >
+            下载当前配置文件
+          </Button>
+        </Space>
+      </div>
+
+      {/* <Button type="primary" onClick={() => test("setting")}>
         数据从后台获取
       </Button>
-      <Switch
-        style={{ marginLeft: "10px", marginRight: "10px" }}
-        size="small"
-        defaultChecked={setSettings.init}
-        onChange={(val) =>
-          setSettings((prevState) => ({
-            ...prevState,
-            init: true,
-          }))
-        }
+      <Button type="danger" onClick={setTestData}>
+        设置初始数据
+      </Button> */}
+      <Divider orientation="left">数据配置项</Divider>
+
+      <ImportJson
+        onSave={(txt) => {
+          const txtToJson = JSON.parse(txt);
+          saveChromeStorageLocal(txtToJson);
+          setAjaxInterceptorRules(txtToJson[types.INTERCEPTO_RULES]);
+          setAjaxInterceptorSwitchOn(true);
+          message.success("保存成功");
+        }}
       />
     </div>
   );
 };
 
 export default MainApp;
-

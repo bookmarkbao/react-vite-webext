@@ -89,6 +89,12 @@ export const MainApp = () => {
     console.log(`数据更新`);
     console.log(opt, value);
     chrome.storage.local.set(value !== undefined ? { [opt]: value } : { ...opt });
+    if(value === true) { // 对象
+      set(types.INTERCEPTO_RULES, opt[types.INTERCEPTO_RULES]); // 数据同步过去
+      set(types.SWITCH_ON, opt[types.SWITCH_ON]);
+    } else {
+      set(opt, value); // 数据同步过去
+    }
   };
 
   const downloadJSON = (name) => {
@@ -273,7 +279,7 @@ export const MainApp = () => {
         }}
       >
         <Space>
-          <Button size="small" circle type="primary" onClick={() => toggleIframe()}>
+          <Button size="small" type="primary" onClick={() => toggleIframe()}>
             隐藏
           </Button>
           <Switch

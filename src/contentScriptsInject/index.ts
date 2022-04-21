@@ -3,11 +3,12 @@
  * @Author: xiangjun02
  * @Date: 2022-04-06 02:51:03
  * @LastEditors: xiangjun02
- * @LastEditTime: 2022-04-19 02:14:41
+ * @LastEditTime: 2022-04-20 19:34:23
  */
 // 读取某个配置想的所有文件
 
 const files = ["test99.js", "main.js"];
+import * as types from '../components/types'
 const addScript = (src) => {
   // 在页面上插入script连接
   const script = document.createElement("script");
@@ -46,12 +47,14 @@ window.cLog = cLog;
 // 页面load后，加载配置信息
 loadScript.addEventListener("load", () => {
   chrome.storage.local.get(
-    ["settings", "ajaxInterceptor_switchOn", "ajaxInterceptor_rules"],
+    ["ajaxInterceptor_switchOn", "ajaxInterceptor_rules"],
     (resultObj) => {
       cLog("index >> 页面load后，加载配置信息");
       console.log("script.addEventListener > load", resultObj);
-
-      const result = resultObj.settings || {};
+      const result =  {
+        [types.INTERCEPTO_RULES] : resultObj[types.INTERCEPTO_RULES],
+        [types.SWITCH_ON] : resultObj[types.SWITCH_ON]
+      };
       console.log("%c script.addEventListener>>>load", "color: blue;");
       console.log(result);
       if (result.hasOwnProperty("ajaxInterceptor_switchOn")) {
@@ -78,8 +81,8 @@ loadScript.addEventListener("load", () => {
 let iframeLoaded = false;
 // 接收background.js传来的信息，转发给pageScript
 chrome.runtime.onMessage.addListener((msg) => {
-  cLog("index >> 接收background.js传来的信息，转发给pageScript ==== addListener");
-  console.log(`index.ts >> chrome.runtime.onMessage.addListener`, msg);
+  // cLog("index >> 接收background.js传来的信息，转发给pageScript ==== addListener");
+  // console.log(`index.ts >> chrome.runtime.onMessage.addListener`, msg);
   if (msg.type === "ajaxInterceptor" && msg.to === "content") {
     if (msg.hasOwnProperty("iframeScriptLoaded")) {
       if (msg.iframeScriptLoaded) iframeLoaded = true;
@@ -88,12 +91,14 @@ chrome.runtime.onMessage.addListener((msg) => {
     }
   }
 });
+
+
 // 接收pageScript传来的信息，转发给iframe
 window.addEventListener(
   "pageScript",
   (event) => {
-    cLog("index >> 接收pageScript传来的信息，转发给iframe ==== addEventListener");
-    console.log(`index.ts >> pageScript window.addEventListener`, event);
+    // cLog("index >> 接收pageScript传来的信息，转发给iframe ==== addEventListener");
+    // console.log(`index.ts >> pageScript window.addEventListener`, event);
     if (iframeLoaded) {
       chrome.runtime.sendMessage({
         type: "ajaxInterceptor",

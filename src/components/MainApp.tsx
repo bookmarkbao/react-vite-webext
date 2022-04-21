@@ -29,6 +29,23 @@ const dateFormat = (fmt, date) => {
   return fmt;
 };
 
+console.log(`set MappApp.tsx`);
+const set = (key, value) => {
+  console.log(`set > `, key, value);
+  // 数据同步过去
+  try {
+    chrome.runtime.sendMessage(chrome.runtime.id, {
+      type: "ajaxInterceptor",
+      to: "background",
+      key,
+      value,
+    });
+  } catch (error) {
+    console.log("set >> ", error);
+  }
+};
+
+
 const ImportJson = (props) => {
   const [overrideTxt, setOverrideText] = useState("");
   const onChangeReplace = (key, value) => {
@@ -89,7 +106,7 @@ export const MainApp = () => {
     console.log(`数据更新`);
     console.log(opt, value);
     chrome.storage.local.set(value !== undefined ? { [opt]: value } : { ...opt });
-    if(value === true) { // 对象
+    if(value === undefined) { // 对象
       set(types.INTERCEPTO_RULES, opt[types.INTERCEPTO_RULES]); // 数据同步过去
       set(types.SWITCH_ON, opt[types.SWITCH_ON]);
     } else {
@@ -176,20 +193,6 @@ export const MainApp = () => {
         </div>
       </>
     );
-  };
-
-  const set = (key, value) => {
-    // 数据同步过去
-    try {
-      chrome.runtime.sendMessage(chrome.runtime.id, {
-        type: "ajaxInterceptor",
-        to: "background",
-        key,
-        value,
-      });
-    } catch (error) {
-      console.log("set >> ", error);
-    }
   };
 
   // ajaxInterceptor_rules下属性的修改

@@ -11,3 +11,9 @@ body,
 .icon-btn {
   font-size: 0.9em;
 }
+
+.dxx-content{
+  position: fixed;
+  left:0;
+  bottom:0;
+}

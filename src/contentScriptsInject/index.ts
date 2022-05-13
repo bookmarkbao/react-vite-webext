@@ -1,3 +1,4 @@
+// @ts-nocheck # 忽略全文
 /*
  * @Descripttion: 这部分代码，相当于content代码
  * @Author: xiangjun02
@@ -9,6 +10,7 @@
 
 // import server from './server';
 // import client from './client';
+// import '~/contentScriptsInject/server'
 
 const files = ["test99.js", "main.js"];
 import * as types from '../components/types'

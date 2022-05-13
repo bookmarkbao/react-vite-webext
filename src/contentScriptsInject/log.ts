@@ -1,10 +1,10 @@
-import * as types from "../components/types";
+// @ts-nocheck # 忽略全文
 const isDebug = true;
 function log() {
   isDebug && console.log(...arguments);
 }
 let counter = 0;
-function cLog(msg, action) {
+function cLog(msg:any, action: any) {
   switch (action) {
     case "warning":
       console.log(`%c ${counter++} >> ${msg}`, "color: blue;font-size: 24px;");
@@ -16,7 +16,10 @@ function cLog(msg, action) {
 let reqApiResult = [];
 const bucketStore = new Map();
 const reqApiList = new Set();
+
+// @ts-ignore
 window.reqApiList = reqApiList;
+// @ts-ignore
 window.bucketStore = bucketStore;
 // 命名空间
 let ajax_interceptor_qoweifjqon = {
@@ -216,7 +219,7 @@ let ajax_interceptor_qoweifjqon = {
   },
 };
 
-localStorage.setItem('switchAjaxInterceptor', true)
+localStorage.setItem('switchAjaxInterceptor', false)
 
 // 从[background，iframe]过来的信息，更新pageContent脚本内容
 let started = false;

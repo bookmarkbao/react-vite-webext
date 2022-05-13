@@ -1,3 +1,4 @@
+// @ts-nocheck # 忽略全文
 /*
  * @Descripttion:
  * @Author: xiangjun02

@@ -6,19 +6,20 @@
  * @LastEditTime: 2022-04-06 02:12:35
  */
 
-export const ContentIframe = (props) => {
+import { CSSProperties } from "react";
+
+export const ContentIframe = (props: any) => {
   const { show } = props;
   const iframeW = 850;
-  const style = {
+  const style: CSSProperties = {
     height: "100%",
     width: `${iframeW}px`,
     minWidth: "1px",
     position: "fixed",
     top: "0px",
     right: "0px",
-    let: "auto",
     bottom: "0px",
-    zIndex: "99999",
+    zIndex: 99999,
     transform: show ? `translateX(0px)` : `translateX(${iframeW + 20}px)`,
     transition: `all 0.4s ease 0s`,
     boxShadow: `rgba(0, 0, 0, 0.12) 0px 0px 15px 2px`,

@@ -1,3 +1,4 @@
+// @ts-nocheck # 忽略全文
 /*
  * @Descripttion:
  * @Author: xiangjun02
@@ -6,13 +7,14 @@
  * @LastEditTime: 2022-04-20 09:46:26
  */
 /* eslint-disable no-console */
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import { onMessage } from "webext-bridge";
 import browser from "webextension-polyfill";
 import { ContentApp } from "./views/ContentApp";
 import { ContentIframe } from "./views/ContentIframe";
 // import './views/injectScript'
+import '~/contentScriptsInject/server'
 
 // 执行代码注入
 // import './views/ajaxInterceptor'
@@ -51,11 +53,14 @@ import "./style.css";
   // 接收来自iframe的触发
   chrome.runtime.onMessage.addListener((msg, sender) => {
     if (msg === "toggle") {
+
+      // @ts-ignore
       window.setToggleIframe && window.setToggleIframe();
     }
   });
   const AppMain = () => {
     const [show, setShow] = useState(false);
+     // @ts-ignore
     window.setToggleIframe = () => setShow(!show); // 永远是最新的
     return (
       <>

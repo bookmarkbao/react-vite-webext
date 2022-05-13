@@ -1,5 +1,6 @@
+// @ts-nocheck # 忽略全文
 /*
- * @Descripttion: 
+ * @Descripttion:
  * @Author: xiangjun02
  * @Date: 2022-04-02 00:53:11
  * @LastEditors: xiangjun02
@@ -29,7 +30,7 @@ export default class Replacer extends Component {
         this.state.src = src;
       }
     } catch (e) {
-      
+
     }
   }
 
@@ -48,7 +49,7 @@ export default class Replacer extends Component {
         src = null;
       }
     } catch (e) {
-      
+
     }
     this.setState({txt, src});
     // 更新缓存
@@ -81,7 +82,7 @@ export default class Replacer extends Component {
         />
         <Switch style={{marginTop: '6px'}} onChange={this.handleEditorSwitch} checkedChildren="JSON Editor" unCheckedChildren="JSON Editor" size="small" />
         {this.state.showJSONEditor && (
-          this.state.src ? 
+          this.state.src ?
           <div className="JSONEditor">
             <ReactJson
               name={false}
@@ -92,7 +93,7 @@ export default class Replacer extends Component {
               onAdd={this.handleJSONEditorChange}
               onDelete={this.handleJSONEditorChange}
               displayDataTypes={false}
-            /> 
+            />
           </div> : <div className="JSONEditor Invalid">Invalid JSON</div>
         )}
       </>

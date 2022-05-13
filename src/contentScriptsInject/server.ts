@@ -5,28 +5,34 @@
 import { createServer } from "connect.io";
 // import st from "./st";
 const server = createServer();
-
+console.log(`前端服务已经启动===111`);
 /* istanbul ignore next */
 /**
  * 将自己的 location 对象报告给后台
  * @param data
  * @param {Function} resolve
  */
-export function onGetLocation(data, resolve) {
+export function onGetLocation(data: any, resolve: any) {
+  // eslint-disable-next-line no-restricted-globals
   if (self === top) {
+    // eslint-disable-next-line no-restricted-globals
     resolve(JSON.parse(JSON.stringify(location)));
   }
 }
 
 /**
- * 接收到翻译命令时，翻译网页上的拖蓝
+ * 需要返回值时，参数resolve
  */
-export function onTranslate() {
-//   st.query.text = getSelection().toString();
-//   st.safeTranslate();
+export function onTranslate(text: any, resolve: any) {
+  //   st.query.text = getSelection().toString();
+  //   st.safeTranslate();
+  console.log(window.document.title, 1234567)
+  console.log(`66666`, text)
+  resolve(window.document.title)
 }
 
 server.on("connect", (client) => {
+  console.log(`前端connect`, 666666);
   client.on("get location", onGetLocation);
   client.on("translate", onTranslate);
 });

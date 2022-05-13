@@ -1,22 +1,24 @@
-import React, { useState, useEffect } from "react";
-import { Switch, Collapse, Button, Input, Select, Tooltip, Badge, Radio, message, Divider, Space, Popconfirm } from "antd";
+// @ts-nocheck # 忽略全文
+import  { useState, useEffect } from "react";
+import { Switch, Collapse, Button, Input, Select, Tooltip, Badge,  message, Divider, Space, Popconfirm } from "antd";
 import { MinusCircleOutlined } from "@ant-design/icons";
 import Replacer from "~/components/Replacer";
 import * as types from "~/components/types";
 import { toggleIframe } from "~/logic/utils";
 import "./Main.less";
 import client from "~/contentScriptsInject/client";
+import { send } from "connect.io";
+import { getCurrentTabId } from "~/utils";
 const { Option } = Select;
-const { TextArea } = Input;
 const Panel = Collapse.Panel;
-import { createClient } from "connect.io";
-const clientInBackground = createClient({
-  namespace: "contentPage",
-}); // the tab id you want to connect
+// import { createClient } from "connect.io";
+// const clientInBackground = createClient({
+//   namespace: "contentPage",
+// });
 
-const dateFormat = (fmt, date) => {
+const dateFormat = (fmt:string , date: any) => {
   let ret;
-  const opt = {
+  const opt: any = {
     "Y+": date.getFullYear().toString(), // 年
     "m+": (date.getMonth() + 1).toString(), // 月
     "d+": date.getDate().toString(), // 日
@@ -35,7 +37,7 @@ const dateFormat = (fmt, date) => {
 };
 
 console.log(`set MappApp.tsx`);
-const set = (key, value) => {
+const set = (key: string, value: any) => {
   console.log(`set > `, key, value);
   // 数据同步过去
   try {
@@ -50,9 +52,9 @@ const set = (key, value) => {
   }
 };
 
-const ImportJson = (props) => {
+const ImportJson = (props: any) => {
   const [overrideTxt, setOverrideText] = useState("");
-  const onChangeReplace = (key, value) => {
+  const onChangeReplace = (key: any, value: any) => {
     // console.log(key, value);
     setOverrideText(value);
   };
@@ -74,6 +76,8 @@ const ImportJson = (props) => {
       message.error("无效的JSON格式");
     }
   };
+  // @ts-ignore
+  // @ts-ignore
   return (
     <div style={{ padding: `20px 20px` }}>
       <Button type="primary" onClick={saveAndReplaceContent}>
@@ -287,9 +291,19 @@ export const MainApp = () => {
     console.log(`发送了open options`, "我是来自iframe的哟");
   };
 
-  const testSendToContext = () => {
-    console.log(`send testSendToContext 9999`);
-    clientInBackground.send("openContent", { type: "iframe", msg: "我来自iframeContent to content" });
+  const testSendToContext = async () => {
+    const tabId = await getCurrentTabId();
+    console.log(`send testSendToContext 9999`, tabId);
+    // client.send( 'get translate result' , this.query , true )
+    send({
+      id: await getCurrentTabId(),
+      name: "translate",
+      data: { name: 'hell12345' },
+      needResponse : true
+    }).then(res=>{
+      console.log(res, '这是返回值')
+    }).catch( ()=> null ); // 获取出错时仍然让此状态成功，只是值是 null，表示没有权限获取;
+    // clientInBackground.send("openContent", { type: "iframe", msg: "我来自iframeContent to content" });
   };
 
   const addItem = () => {

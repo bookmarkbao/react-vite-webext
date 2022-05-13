@@ -1,22 +1,34 @@
 /**
  * @files 用于处理其他页面发送过来的命令
  */
-import { createServer } from "connect.io";
-import chromeCall from "chrome-call";
-console.log('启动了connect.io===background')
+import { createServer, send } from "connect.io";
+import { getCurrentTabId } from "~/utils";
+console.log("启动了connect.io===background");
 const server = createServer();
+
+const testSendToContext = async () => {
+  const tabId = await getCurrentTabId();
+  console.log(`send testSendToContext 9999`, tabId);
+  send({
+    id: await getCurrentTabId(),
+    name: "translate",
+    data: { name: 'hello' }
+  });
+  // clientInBackground.send("openContent", { type: "iframe", msg: "我来自iframeContent to content" });
+};
 
 /**
  * 复制文本到剪切板
  * @param {String} text
  */
-export function onCopy(text) {
+export function onCopy(text: any) {
   // ga("send", "event", "复制文本");
-  console.log(text, 9999)
+  console.log(text, 9999);
+  testSendToContext();
 }
 
 server.on("connect", (client) => {
-  console.log(`background-server req 999`)
+  console.log(`background-server req 999`);
   client.on("get translate result", onCopy);
   client.on("play", onCopy);
   client.on("copy", onCopy);

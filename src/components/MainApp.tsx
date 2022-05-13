@@ -5,9 +5,14 @@ import Replacer from "~/components/Replacer";
 import * as types from "~/components/types";
 import { toggleIframe } from "~/logic/utils";
 import "./Main.less";
+import client from "~/contentScriptsInject/client";
 const { Option } = Select;
 const { TextArea } = Input;
 const Panel = Collapse.Panel;
+import { createClient } from "connect.io";
+const clientInBackground = createClient({
+  namespace: "contentPage",
+}); // the tab id you want to connect
 
 const dateFormat = (fmt, date) => {
   let ret;
@@ -44,7 +49,6 @@ const set = (key, value) => {
     console.log("set >> ", error);
   }
 };
-
 
 const ImportJson = (props) => {
   const [overrideTxt, setOverrideText] = useState("");
@@ -86,6 +90,8 @@ export const MainApp = () => {
   const [interceptedRequests, setInterceptedRequests] = useState({});
   const [ajaxInterceptorRules, setAjaxInterceptorRules] = useState([]);
   const [ajaxInterceptorSwitchOn, setAjaxInterceptorSwitchOn] = useState(false);
+  const [visible, setVisible] = useState(true);
+  const [configVisible, setConfigVisible] = useState(false);
   const updateAddBtnTop = () => {
     console.log("updateAddBtnTop", 99999);
   };
@@ -106,7 +112,8 @@ export const MainApp = () => {
     console.log(`数据更新`);
     console.log(opt, value);
     chrome.storage.local.set(value !== undefined ? { [opt]: value } : { ...opt });
-    if(value === undefined) { // 对象
+    if (value === undefined) {
+      // 对象
       set(types.INTERCEPTO_RULES, opt[types.INTERCEPTO_RULES]); // 数据同步过去
       set(types.SWITCH_ON, opt[types.SWITCH_ON]);
     } else {
@@ -228,12 +235,19 @@ export const MainApp = () => {
               />
             </Input.Group>
             <Switch style={{ marginLeft: "10px", marginRight: "10px" }} size="small" defaultChecked={switchOn} onChange={(val) => handleCommonChange("switchOn", val, index, false)} />
-            <Popconfirm placement="topLeft" title="确定删除吗？" onConfirm={()=>{
-               ajaxInterceptorRules.splice(index, 1);
-               setAjaxInterceptorRules([...ajaxInterceptorRules]);
-               saveChromeStorageLocal(types.INTERCEPTO_RULES, ajaxInterceptorRules);
-            }} okText="确定" cancelText="取消">
-                <MinusCircleOutlined style={{ fontSize: "18px", color: "#08c" }}/>
+            <Popconfirm
+              placement="topLeft"
+              title="确定删除吗？"
+              onConfirm={() => {
+                const indexOf = ajaxInterceptorRules.findIndex((item) => item.key === key);
+                ajaxInterceptorRules.splice(indexOf);
+                setAjaxInterceptorRules([...ajaxInterceptorRules]);
+                saveChromeStorageLocal(types.INTERCEPTO_RULES, ajaxInterceptorRules);
+              }}
+              okText="确定"
+              cancelText="取消"
+            >
+              <MinusCircleOutlined style={{ fontSize: "18px", color: "#08c" }} />
             </Popconfirm>
           </div>
         }
@@ -248,10 +262,11 @@ export const MainApp = () => {
     console.log("test setting", result);
   };
   const renderContent = () => {
+    const listRulesFilter = visible ? ajaxInterceptorRules.filter((item) => item.switchOn) : ajaxInterceptorRules;
     return (
       <div style={{ padding: `0 20px` }}>
         <Collapse defaultActiveKey={["1"]} onChange={() => ({})}>
-          {ajaxInterceptorRules.map((item, index) => renderPanelHeader(item, index))}
+          {listRulesFilter.map((item, index) => renderPanelHeader(item, index))}
         </Collapse>
       </div>
     );
@@ -265,6 +280,16 @@ export const MainApp = () => {
       return (c == "x" ? r : (r & 0x3) | 0x8).toString(16);
     });
     return uuid;
+  };
+
+  const testClients = () => {
+    client.send("open options", { type: "iframe", msg: "我来自iframe" });
+    console.log(`发送了open options`, "我是来自iframe的哟");
+  };
+
+  const testSendToContext = () => {
+    console.log(`send testSendToContext 9999`);
+    clientInBackground.send("openContent", { type: "iframe", msg: "我来自iframeContent to content" });
   };
 
   const addItem = () => {
@@ -295,26 +320,66 @@ export const MainApp = () => {
               saveChromeStorageLocal(types.SWITCH_ON, val);
             }}
           />
-        </Space>
-      </div>
-
-      <Divider orientation="left">拦截接口配置</Divider>
-      {ajaxInterceptorSwitchOn && renderContent()}
-      <div style={{ padding: `20px 20px` }}>
-        <Space>
-          <Button type="primary" onClick={() => addItem()}>
-            新增
-          </Button>
-          <Button
-            type="primary"
-            onClick={() => {
-              downloadJSON("ajax-interceptor");
+          <Switch
+            checked={visible}
+            defaultChecked={visible}
+            checkedChildren="API"
+            unCheckedChildren="API"
+            onChange={(val) => {
+              setVisible(val);
             }}
-          >
-            下载当前配置文件
-          </Button>
+          />
+          <Switch
+            checked={configVisible}
+            defaultChecked={configVisible}
+            checkedChildren="配置"
+            unCheckedChildren="配置"
+            onChange={(val) => {
+              setConfigVisible(val);
+            }}
+          />
         </Space>
       </div>
+      {configVisible ? (
+        <>
+          <Divider orientation="left">数据配置项</Divider>
+          <ImportJson
+            onSave={(txt) => {
+              const txtToJson = JSON.parse(txt);
+              saveChromeStorageLocal(txtToJson);
+              setAjaxInterceptorRules(txtToJson[types.INTERCEPTO_RULES]);
+              setAjaxInterceptorSwitchOn(true);
+              message.success("保存成功");
+            }}
+          />
+        </>
+      ) : (
+        <>
+          <Divider orientation="left">拦截接口配置</Divider>
+          {ajaxInterceptorSwitchOn && renderContent()}
+          <div style={{ padding: `20px 20px` }}>
+            <Space>
+              <Button type="primary" onClick={() => addItem()}>
+                新增
+              </Button>
+              <Button type="primary" onClick={testClients}>
+                测试数据发送
+              </Button>
+              <Button type="primary" onClick={testSendToContext}>
+                testSendToContext
+              </Button>
+              <Button
+                type="primary"
+                onClick={() => {
+                  downloadJSON("ajax-interceptor");
+                }}
+              >
+                下载当前配置文件
+              </Button>
+            </Space>
+          </div>
+        </>
+      )}
 
       {/* <Button type="primary" onClick={() => test("setting")}>
         数据从后台获取
@@ -322,17 +387,6 @@ export const MainApp = () => {
       <Button type="danger" onClick={setTestData}>
         设置初始数据
       </Button> */}
-      <Divider orientation="left">数据配置项</Divider>
-
-      <ImportJson
-        onSave={(txt) => {
-          const txtToJson = JSON.parse(txt);
-          saveChromeStorageLocal(txtToJson);
-          setAjaxInterceptorRules(txtToJson[types.INTERCEPTO_RULES]);
-          setAjaxInterceptorSwitchOn(true);
-          message.success("保存成功");
-        }}
-      />
     </div>
   );
 };

@@ -8,7 +8,7 @@
 import { sendMessage, onMessage } from "webext-bridge";
 import { Tabs } from "webextension-polyfill";
 import browser from "webextension-polyfill";
-
+import './server';
 // only on dev mode
 if (import.meta.hot) {
   // @ts-expect-error for background HMR

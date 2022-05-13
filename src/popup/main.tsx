@@ -8,6 +8,7 @@
 import "../styles";
 import React from "react";
 import ReactDOM from "react-dom";
+// import './server'
 import { Popup } from "./Popup";
 
 ReactDOM.render(

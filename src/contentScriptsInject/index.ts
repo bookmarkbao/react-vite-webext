@@ -7,6 +7,9 @@
  */
 // 读取某个配置想的所有文件
 
+// import server from './server';
+// import client from './client';
+
 const files = ["test99.js", "main.js"];
 import * as types from '../components/types'
 const addScript = (src) => {
@@ -49,14 +52,14 @@ loadScript.addEventListener("load", () => {
   chrome.storage.local.get(
     ["ajaxInterceptor_switchOn", "ajaxInterceptor_rules"],
     (resultObj) => {
-      cLog("index >> 页面load后，加载配置信息");
-      console.log("script.addEventListener > load", resultObj);
+      // cLog("index >> 页面load后，加载配置信息");
+      // console.log("script.addEventListener > load", resultObj);
       const result =  {
         [types.INTERCEPTO_RULES] : resultObj[types.INTERCEPTO_RULES],
         [types.SWITCH_ON] : resultObj[types.SWITCH_ON]
       };
-      console.log("%c script.addEventListener>>>load", "color: blue;");
-      console.log(result);
+      // console.log("%c script.addEventListener>>>load", "color: blue;");
+      // console.log(result);
       if (result.hasOwnProperty("ajaxInterceptor_switchOn")) {
         postMessage({
           type: "ajaxInterceptor",

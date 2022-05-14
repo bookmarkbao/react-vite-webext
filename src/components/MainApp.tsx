@@ -233,7 +233,7 @@ export const MainApp = () => {
               title="确定删除吗？"
               onConfirm={() => {
                 const indexOf = ajaxInterceptorRules.findIndex((item: any) => item.key === key);
-                ajaxInterceptorRules.splice(indexOf);
+                ajaxInterceptorRules.splice(indexOf,1);
                 setAjaxInterceptorRules([...ajaxInterceptorRules]);
 
                 // @ts-ignore

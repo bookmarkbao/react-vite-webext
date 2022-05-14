@@ -1,5 +1,5 @@
 /*
- * @Descripttion: 
+ * @Descripttion:
  * @Author: xiangjun02
  * @Date: 2022-04-04 00:39:25
  * @LastEditors: xiangjun02
@@ -48,6 +48,8 @@ export async function getManifest() {
     content_scripts: [{
       matches: ['http://*/*', 'https://*/*'],
       js: ['./pageScriptsInject/index.js','./dist/contentScripts/index.global.js'],
+      run_at: "document_start",
+      all_frames: true
     }],
     web_accessible_resources: [
       'dist/contentScripts/style.css',

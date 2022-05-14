@@ -1,3 +1,4 @@
+// @ts-nocheck # 忽略全文
 import { useState, useEffect } from "react";
 import { Switch, Collapse, Button, Input, Select, Tooltip, Badge, message, Divider, Space, Popconfirm } from "antd";
 import { MinusCircleOutlined } from "@ant-design/icons";
@@ -8,16 +9,10 @@ import "./Main.less";
 import client from "~/contentScriptsInject/client";
 import { send } from "connect.io";
 import { getCurrentTabId } from "~/utils";
-// @ts-ignore
 import chromeCall from "chrome-call";
 
 const { Option } = Select;
 const Panel = Collapse.Panel;
-// import { createClient } from "connect.io";
-// const clientInBackground = createClient({
-//   namespace: "contentPage",
-// });
-
 const dateFormat = (fmt: string, date: any) => {
   let ret;
   const opt: any = {
@@ -64,20 +59,20 @@ const ImportJson = (props: any) => {
   const updateAddBtnTop = () => {
   };
 
-  const saveAndReplaceContent = () => {
+  const saveAndReplaceContent = async () => {
     try {
       const jsonData = JSON.parse(overrideTxt);
       if (jsonData[types.INTERCEPTO_RULES] === undefined) {
-        message.error(`未配置${types.INTERCEPTO_RULES}参数，请检查`);
+        await message.error(`未配置${types.INTERCEPTO_RULES}参数，请检查`);
         return;
       }
       if (jsonData[types.SWITCH_ON] === undefined) {
-        message.error(`未配置${types.SWITCH_ON}参数，请检查`);
+        await message.error(`未配置${types.SWITCH_ON}参数，请检查`);
         return;
       }
       props.onSave(overrideTxt);
     } catch (error) {
-      message.error("无效的JSON格式");
+      await message.error("无效的JSON格式");
     }
   };
   // @ts-ignore
@@ -113,17 +108,18 @@ export const MainApp = () => {
   };
 
   // 保存数据. 如果value有值，则是key => value， 否则是对象
-  const saveChromeStorageLocal = (opt: any, value = undefined) => {
+  const saveChromeStorageLocal = async (opt: any, value = undefined) => {
     if (!chrome.storage) {
       message.error("不支持").then(r => null);
     }
     const saveContext = value !== undefined ? { [opt]: value } : { ...opt };
+    console.log(`saveChromeStorageLocal`,saveContext)
     chromeCall("storage.local.set", { ...saveContext });
     if (value === undefined) {
-      set(types.INTERCEPTO_RULES, opt[types.INTERCEPTO_RULES]).then(r => null); // 数据同步过去
-      set(types.SWITCH_ON, opt[types.SWITCH_ON]).then(r => null);
+      await set(types.INTERCEPTO_RULES, opt[types.INTERCEPTO_RULES]); // 数据同步过去
+      await set(types.SWITCH_ON, opt[types.SWITCH_ON]);
     } else {
-      set(opt, value).then(r => null); // 数据同步过去
+      await set(opt, value); // 数据同步过去
     }
   };
 

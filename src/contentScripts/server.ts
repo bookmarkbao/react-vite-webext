@@ -26,9 +26,6 @@ export function onGetLocation(data: any, resolve: any) {
 export function onTranslate(text: any, resolve: any) {
   //   st.query.text = getSelection().toString();
   //   st.safeTranslate();
-  console.log(window.document.title, 1234567)
-  console.log(window, 1234567)
-  console.log(`66666`, text)
   resolve(window.document.title)
 }
 
@@ -36,12 +33,19 @@ export function onTranslate(text: any, resolve: any) {
  * content_script to injected_script
  * 第一种方法
  */
-const testOne = ()=> {
+const testOne = (data: any)=> {
     const myEvent = new CustomEvent("injectEvent",{
       detail : {
-        test: 'daxinag'
+        ...data
       }
     })
+    window.dispatchEvent(myEvent)
+}
+
+const textAutoExecuteXhr = ()=>{
+      // 通知替换xhr
+    const myEvent = new Event("autoExecuteEvent")
+    console.log(`=====执行firstScript`)
     window.dispatchEvent(myEvent)
 }
 
@@ -52,7 +56,6 @@ const testOne = ()=> {
 const customEvent = new CustomEvent('myCustomEvent')
 // customEvent.initEvent('myCustomEvent', true, true);
 function fireCustomEvent(data:any) {
-  console.log(`fireCustomEvent === 开始`)
   let hiddenDiv: HTMLElement = document.getElementById('myCustomEventDiv') as HTMLElement;
 	hiddenDiv.innerText = data
   hiddenDiv.dispatchEvent(customEvent);
@@ -70,16 +73,18 @@ const testPostMessage = ()=> {
 }
 
 
+const openDebug = false
+
 /**
  * 数据保存到当前环境，同时保存到本地local。需要返回值
  */
 export const saveToWin = (data: any, resolve: any)=> {
-  console.log('iframe同步过来到数据：',data)
   // @ts-ignore
-  console.log('全局ajax99999',window)
-  fireCustomEvent('你好，我是普通JS！');
-  testPostMessage();
-  testOne();
+  openDebug && fireCustomEvent('你好，我是普通JS！');
+  openDebug && testPostMessage();
+   openDebug && textAutoExecuteXhr();
+  // console.log(`saveToWin`, data)
+  testOne(data);
   resolve({code: 0, msg: '同步成功'})
 }
 

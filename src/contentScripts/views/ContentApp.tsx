@@ -13,7 +13,7 @@ const testClients = () => {
   console.log(`发送了open options`, '我是来自page content元素的哟 666')
 }
 
-export const ContentApp = (props) => {
+export const ContentApp = (props: any) => {
   const { onToggle } = props;
   return (
     <div className="dxx-content">

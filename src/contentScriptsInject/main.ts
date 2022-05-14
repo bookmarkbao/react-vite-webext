@@ -16,13 +16,14 @@ function cLog(msg:any, action: any) {
 let reqApiResult = [];
 const bucketStore = new Map();
 const reqApiList = new Set();
-
+console.log(`ajax_interceptor_dx启动了`)
+cLog999(`ajax_interceptor_dx启动了`)
 // @ts-ignore
 window.reqApiList = reqApiList;
 // @ts-ignore
 window.bucketStore = bucketStore;
 // 命名空间
-let ajax_interceptor_qoweifjqon = {
+let ajax_interceptor_dx = {
   settings: {
     ajaxInterceptor_switchOn: false,
     ajaxInterceptor_rules: [],
@@ -43,7 +44,7 @@ let ajax_interceptor_qoweifjqon = {
       console.log(ajaxReqURL, this.responseText);
       console.log(`ajaxReqURL`,ajaxReqURL);
       // 去配置中查找，是否有符合条件的路由
-      ajax_interceptor_qoweifjqon.settings.ajaxInterceptor_rules.forEach(({ filterType = "normal", switchOn = true, match, overrideTxt = "" }) => {
+      ajax_interceptor_dx.settings.ajaxInterceptor_rules.forEach(({ filterType = "normal", switchOn = true, match, overrideTxt = "" }) => {
         let matched = false;
         // 全局switchOn打开 ， 存在配置match
         if (switchOn && match) {
@@ -60,11 +61,11 @@ let ajax_interceptor_qoweifjqon = {
         // 如果匹配成功，则进行结果修改
         if (matched) {
           cLog("匹配结果");
-          log("overrideTxt", overrideTxt);
+          main("overrideTxt", overrideTxt);
           this.responseText = overrideTxt;
           this.response = overrideTxt;
           if (!pageScriptEventDispatched) {
-            log("matched pageScript", pageScriptEventDispatched);
+            main("matched pageScript", pageScriptEventDispatched);
             window.dispatchEvent(
               new CustomEvent("pageScript", {
                 detail: { url: this.responseURL, match },
@@ -77,13 +78,13 @@ let ajax_interceptor_qoweifjqon = {
     };
 
     // 正常采用原生请求 = 请求成功之后，由modify决定是否替换
-    const xhr = new ajax_interceptor_qoweifjqon.originalXHR();
+    const xhr = new ajax_interceptor_dx.originalXHR();
     for (let attr in xhr) {
       if (attr === "onreadystatechange") {
         xhr.onreadystatechange = (...args) => {
           if (this.readyState === 4) {
             // 请求成功
-            if (ajax_interceptor_qoweifjqon.settings.ajaxInterceptor_switchOn) {
+            if (ajax_interceptor_dx.settings.ajaxInterceptor_switchOn) {
               // 开启拦截
               modifyResponse();
             }
@@ -94,7 +95,7 @@ let ajax_interceptor_qoweifjqon = {
       } else if (attr === "onload") {
         xhr.onload = (...args) => {
           // 请求成功
-          if (ajax_interceptor_qoweifjqon.settings.ajaxInterceptor_switchOn) {
+          if (ajax_interceptor_dx.settings.ajaxInterceptor_switchOn) {
             // 开启拦截
             modifyResponse();
           }
@@ -127,8 +128,7 @@ let ajax_interceptor_qoweifjqon = {
 
   originalFetch: window.fetch.bind(window),
   myFetch: function (...args) {
-    // cLog(9998887766)
-    return ajax_interceptor_qoweifjqon.originalFetch(...args).then((response) => {
+    return ajax_interceptor_dx.originalFetch(...args).then((response) => {
       let txt = undefined;
 
       const { hostname, pathname } = new URL(response.url);
@@ -139,7 +139,7 @@ let ajax_interceptor_qoweifjqon = {
       // console.log(9998887766)
       // console.log(ajaxReqURL, response);
 
-      ajax_interceptor_qoweifjqon.settings.ajaxInterceptor_rules.forEach(({ filterType = "normal", switchOn = true, match, overrideTxt = "" }) => {
+      ajax_interceptor_dx.settings.ajaxInterceptor_rules.forEach(({ filterType = "normal", switchOn = true, match, overrideTxt = "" }) => {
         let matched = false;
         // cLog('myFetch XMLHttpRequest >> ')
         // log(response.url, match)
@@ -218,7 +218,6 @@ let ajax_interceptor_qoweifjqon = {
     });
   },
 };
-
 localStorage.setItem('switchAjaxInterceptor', false)
 
 // 从[background，iframe]过来的信息，更新pageContent脚本内容
@@ -236,22 +235,22 @@ const switchAjaxInterceptor = () => {
   console.log(`%c switchAjaxInterceptor:====${switchAjaxInterceptor}`, "color: red;font-size: 24px;");
   // 下面内容，切换拦截，菜又必要执行
   if (switchAjaxInterceptor) {
-    ajax_interceptor_qoweifjqon['settings']['ajaxInterceptor_rules'] = ajaxInterceptor_rules
-    ajax_interceptor_qoweifjqon['settings']['ajaxInterceptor_switchOn'] = switchAjaxInterceptor
+    ajax_interceptor_dx['settings']['ajaxInterceptor_rules'] = ajaxInterceptor_rules
+    ajax_interceptor_dx['settings']['ajaxInterceptor_switchOn'] = switchAjaxInterceptor
     console.log(`switchAjaxInterceptor:====ajaxInterceptor_rules走代理`, ajaxInterceptor_rules);
-    console.log(ajax_interceptor_qoweifjqon)
-    window.XMLHttpRequest = ajax_interceptor_qoweifjqon.myXHR;
-    window.fetch = ajax_interceptor_qoweifjqon.myFetch;
+    console.log(ajax_interceptor_dx)
+    window.XMLHttpRequest = ajax_interceptor_dx.myXHR;
+    window.fetch = ajax_interceptor_dx.myFetch;
   } else {
-    window.XMLHttpRequest = ajax_interceptor_qoweifjqon.originalXHR;
-    window.fetch = ajax_interceptor_qoweifjqon.originalFetch;
+    window.XMLHttpRequest = ajax_interceptor_dx.originalXHR;
+    window.fetch = ajax_interceptor_dx.originalFetch;
   }
-  // if (ajax_interceptor_qoweifjqon.settings.ajaxInterceptor_switchOn) {
-  //   window.XMLHttpRequest = ajax_interceptor_qoweifjqon.myXHR;
-  //   window.fetch = ajax_interceptor_qoweifjqon.myFetch;
+  // if (ajax_interceptor_dx.settings.ajaxInterceptor_switchOn) {
+  //   window.XMLHttpRequest = ajax_interceptor_dx.myXHR;
+  //   window.fetch = ajax_interceptor_dx.myFetch;
   // } else {
-  //   window.XMLHttpRequest = ajax_interceptor_qoweifjqon.originalXHR;
-  //   window.fetch = ajax_interceptor_qoweifjqon.originalFetch;
+  //   window.XMLHttpRequest = ajax_interceptor_dx.originalXHR;
+  //   window.fetch = ajax_interceptor_dx.originalFetch;
   // }
   // 结束状态
   started = true;
@@ -266,7 +265,7 @@ switchAjaxInterceptor();
 //       // log(`webext: 更新pageScript settings数据`);
 //       // log(`webext:===data.value`, data.key, data.value);
 //       localStorage.setItem(data.key, JSON.stringify(data.value))
-//       ajax_interceptor_qoweifjqon.settings[data.key] = data.value;
+//       ajax_interceptor_dx.settings[data.key] = data.value;
 
 //       if (data.key === types.SWITCH_ON && switchStatus !== data.value) {
 //         // 保存状态

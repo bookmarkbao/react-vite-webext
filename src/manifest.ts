@@ -21,8 +21,8 @@ export async function getManifest() {
     version: pkg.version,
     description: pkg.description,
     browser_action: {
-      default_icon: './assets/icon-512.png',
-      default_popup: './dist/popup/index.html',
+      // default_icon: './assets/icon-512.png',
+      // default_popup: './dist/popup/index.html',
     },
     options_ui: {
       page: './dist/options/index.html',
@@ -34,9 +34,9 @@ export async function getManifest() {
       persistent: false,
     },
     icons: {
-      16: './assets/icon-512.png',
-      48: './assets/icon-512.png',
-      128: './assets/icon-512.png',
+      16: './assets/rocket.png',
+      48: './assets/rocket.png',
+      128: './assets/rocket.png',
     },
     permissions: [
       'tabs',

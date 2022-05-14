@@ -11,7 +11,9 @@ import ReactDOM from "react-dom";
 import browser from "webextension-polyfill";
 import { ContentApp } from "./views/ContentApp";
 import { ContentIframe } from "./views/ContentIframe";
+import {  onMessage } from "webext-bridge";
 import "./server";
+// import "./serverBridge"
 import "./style.css";
 
 const container = document.createElement("div");
@@ -31,10 +33,15 @@ document.body.appendChild(container);
 const AppMain = () => {
   const [show, setShow] = useState(false);
   console.log(`appMain`, show)
+  onMessage("toggle iframe",(res)=>{
+    console.log("toggle iframe", res)
+     setShow(!show)
+  })
+
   return (
     <>
-      <ContentIframe show={show} />
-      <ContentApp onToggle={() => setShow(!show)} />
+      <ContentIframe show={show}/>
+      <ContentApp onToggle={() => setShow(!show)}/>
     </>
   );
 };

@@ -6,7 +6,7 @@ import { getCurrentTabId } from "~/utils";
 console.log("启动了connect.io===background");
 const server = createServer();
 
-const testSendToContext = async () => {
+export const testSendToContext = async () => {
   const tabId = await getCurrentTabId();
   console.log(`send testSendToContext 9999`, tabId);
   send({

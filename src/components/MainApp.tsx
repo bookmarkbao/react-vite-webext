@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Switch, Collapse, Button, Input, Select, Tooltip, Badge, message, Divider, Space, Popconfirm } from "antd";
 import { MinusCircleOutlined } from "@ant-design/icons";
-import Replacer from "~/components/Replacer";
+import Replacer from "~/components/ReplacerNew";
 import * as types from "~/components/types";
 import "./Main.less";
 import client from "~/contentScriptsInject/client";

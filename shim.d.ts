@@ -8,3 +8,7 @@ declare module 'webext-bridge' {
     'get-current-tab': ProtocolWithReturn<{ tabId: number }, { title: string }>
   }
 }
+declare module "chrome-call" {
+  import chromeCall from "chrome-call"
+  export default chromeCall
+}

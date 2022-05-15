@@ -1,4 +1,3 @@
-// @ts-nocheck # 忽略全文
 /*
  * @Descripttion:
  * @Author: xiangjun02
@@ -6,28 +5,38 @@
  * @LastEditors: xiangjun02
  * @LastEditTime: 2022-04-20 00:51:47
  */
-import React, {Component} from 'react';
-import {Switch} from 'antd';
-import ReactJson from 'react-json-view';
+import { Component } from "react";
+import { Switch } from "antd";
+import ReactJson from "react-json-view";
+import "./Replacer.less";
 
-import './Replacer.less';
+interface ReplacerPropTypes  {
+  placeholder?: string;
+  showLabel?: boolean;
+  label?: string;
+  defaultValue?: string;
+  updateAddBtnTop?: Function;
+  set: Function;
+  index?: number;
+}
 
-export default class Replacer extends Component {
-  constructor(props) {
+class Replacer extends Component<ReplacerPropTypes,any> {
+  constructor(props: ReplacerPropTypes) {
+    // @ts-ignore
     super();
     this.state = {
       showJSONEditor: false,
       txt: props.defaultValue,
-      placeholder: props.placeholder || '',
+      placeholder: props.placeholder || "",
       src: null,
-      label: props.label || 'Replace With',
+      label: props.label || "Replace With",
       showLabel: props.showLabel === undefined
-    }
+    };
 
     try {
-      let src = JSON.parse(props.defaultValue);
-      if (src && typeof src === 'object') {
-        this.state.src = src;
+      let src = JSON.parse(props.defaultValue || '');
+      if (src && typeof src === "object") {
+        this.setState({src: src})
       }
     } catch (e) {
 
@@ -35,37 +44,38 @@ export default class Replacer extends Component {
   }
 
 
-  componentDidUpdate(prevProps, {showJSONEditor}) {
+  componentDidUpdate(prevProps: any, { showJSONEditor }: { showJSONEditor: boolean }) {
     if (showJSONEditor !== this.state.showJSONEditor) {
+      // @ts-ignore
       this.props.updateAddBtnTop();
     }
   }
 
-  handleOverrideTxtChange = (txt) => {
+  handleOverrideTxtChange = (txt: any) => {
     let src;
     try {
       src = JSON.parse(txt);
-      if (!(src && typeof src === 'object')) {
+      if (!(src && typeof src === "object")) {
         src = null;
       }
     } catch (e) {
 
     }
-    this.setState({txt, src});
+    this.setState({ txt, src });
     // 更新缓存
-    this.props.set('overrideTxt', txt)
-  }
-
-  handleJSONEditorChange = ({updated_src: src}) => {
+    this.props.set("overrideTxt", txt);
+  };
+  // @ts-ignore
+  handleJSONEditorChange = ({ updated_src: src }) => {
     let txt = JSON.stringify(src);
-    this.setState({txt, src});
+    this.setState({ txt, src });
     // 更新缓存
-    this.props.set('overrideTxt', txt)
-  }
-
+    this.props.set("overrideTxt", txt);
+  };
+  // @ts-ignore
   handleEditorSwitch = showJSONEditor => {
-    this.setState({showJSONEditor});
-  }
+    this.setState({ showJSONEditor });
+  };
 
 
   render() {
@@ -76,27 +86,30 @@ export default class Replacer extends Component {
         <textarea
           className="overrideTxt"
           placeholder={this.state.placeholder}
-          style={{resize: 'none'}}
+          style={{ resize: "none" }}
           value={this.state.txt}
           onChange={e => this.handleOverrideTxtChange(e.target.value)}
         />
-        <Switch style={{marginTop: '6px'}} onChange={this.handleEditorSwitch} checkedChildren="JSON Editor" unCheckedChildren="JSON Editor" size="small" />
+        <Switch style={{ marginTop: "6px" }} onChange={this.handleEditorSwitch} checkedChildren="JSON Editor"
+                unCheckedChildren="JSON Editor" size="small" />
         {this.state.showJSONEditor && (
           this.state.src ?
-          <div className="JSONEditor">
-            <ReactJson
-              name={false}
-              collapsed
-              collapseStringsAfterLength={12}
-              src={this.state.src}
-              onEdit={this.handleJSONEditorChange}
-              onAdd={this.handleJSONEditorChange}
-              onDelete={this.handleJSONEditorChange}
-              displayDataTypes={false}
-            />
-          </div> : <div className="JSONEditor Invalid">Invalid JSON</div>
+            <div className="JSONEditor">
+              <ReactJson
+                name={false}
+                collapsed
+                collapseStringsAfterLength={12}
+                src={this.state.src}
+                onEdit={this.handleJSONEditorChange}
+                onAdd={this.handleJSONEditorChange}
+                onDelete={this.handleJSONEditorChange}
+                displayDataTypes={false}
+              />
+            </div> : <div className="JSONEditor Invalid">Invalid JSON</div>
         )}
       </>
     );
   }
 }
+
+export default Replacer

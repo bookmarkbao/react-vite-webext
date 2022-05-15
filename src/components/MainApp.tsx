@@ -1,4 +1,3 @@
-// @ts-nocheck # 忽略全文
 import { useState, useEffect } from "react";
 import { Switch, Collapse, Button, Input, Select, Tooltip, Badge, message, Divider, Space, Popconfirm } from "antd";
 import { MinusCircleOutlined } from "@ant-design/icons";
@@ -8,6 +7,7 @@ import "./Main.less";
 import client from "~/contentScriptsInject/client";
 import { send } from "connect.io";
 import { getCurrentTabId } from "~/utils";
+// @ts-ignore
 import chromeCall from "chrome-call";
 
 const { Option } = Select;
@@ -246,9 +246,11 @@ export const MainApp = () => {
           </div>
         }
       >
-        <Replacer defaultValue={overrideTxt} updateAddBtnTop={updateAddBtnTop} index={index}
+        <Replacer defaultValue={overrideTxt}
+                  updateAddBtnTop={updateAddBtnTop}
+                  index={index}
                   set={(key: string, value: any) => onChangeReplace(key, value, item, index)} />
-        {renderInterceptorInfo(item, match)}
+        {renderInterceptorInfo(item)}
       </Panel>
     );
   };
@@ -280,7 +282,6 @@ export const MainApp = () => {
   };
 
   const testSendToContext = async () => {
-    const tabId = await getCurrentTabId();
     // @ts-ignore
     send({
       id: await getCurrentTabId(),
@@ -293,6 +294,7 @@ export const MainApp = () => {
   };
 
   const togglePanel = async () => {
+    // @ts-ignore
     send({
       id: await getCurrentTabId(),
       name: "toggle iframe",

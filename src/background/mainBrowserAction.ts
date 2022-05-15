@@ -5,17 +5,16 @@ import { getCurrentTabId } from "~/utils";
 import { send } from "connect.io";
 
 browser.browserAction.onClicked.addListener(async (tab) => {
-  console.log(888888);
   const tabId = await getCurrentTabId();
-  sendMessage(
-    "toggle iframe",
-    { code: "ok", msg: "我是向军", data: "get-todo >> onMessage" },
-    { context: "content-script", tabId }
-  );
-
+  // sendMessage(
+  //   "toggle iframe",
+  //   { code: "ok", msg: "我是向军", data: "get-todo >> onMessage" },
+  //   { context: "content-script", tabId }
+  // );
+  //
   send({
     id: await getCurrentTabId(),
-    name: "translate",
+    name: "toggle iframe",
     data: { name: "hello" }
   });
 });
@@ -50,6 +49,20 @@ onMessage("set-icon-browser-action", (action: IconAction) => {
     });
   }
 });
+
+
+// 监听刷新页面
+onMessage("refresh-current-page",async ()=>{
+  const tabId = await getCurrentTabId()
+  browser.tabs
+    .executeScript(tabId, {
+      code: ``,
+      runAt: "document_end",
+    })
+    .then(() => {
+      browser.tabs.reload(tabId)
+    })
+})
 
 chrome.storage.local.get(["ajaxInterceptor_switchOn", "ajaxInterceptor_rules"], (result) => {
   if (result.hasOwnProperty("ajaxInterceptor_switchOn")) {

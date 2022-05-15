@@ -4,7 +4,6 @@ import { Switch, Collapse, Button, Input, Select, Tooltip, Badge, message, Divid
 import { MinusCircleOutlined } from "@ant-design/icons";
 import Replacer from "~/components/Replacer";
 import * as types from "~/components/types";
-import { toggleIframe } from "~/logic/utils";
 import "./Main.less";
 import client from "~/contentScriptsInject/client";
 import { send } from "connect.io";
@@ -113,7 +112,7 @@ export const MainApp = () => {
       message.error("不支持").then(r => null);
     }
     const saveContext = value !== undefined ? { [opt]: value } : { ...opt };
-    console.log(`saveChromeStorageLocal`,saveContext)
+    console.log(`saveChromeStorageLocal`, saveContext);
     chromeCall("storage.local.set", { ...saveContext });
     if (value === undefined) {
       await set(types.INTERCEPTO_RULES, opt[types.INTERCEPTO_RULES]); // 数据同步过去
@@ -233,7 +232,7 @@ export const MainApp = () => {
               title="确定删除吗？"
               onConfirm={() => {
                 const indexOf = ajaxInterceptorRules.findIndex((item: any) => item.key === key);
-                ajaxInterceptorRules.splice(indexOf,1);
+                ajaxInterceptorRules.splice(indexOf, 1);
                 setAjaxInterceptorRules([...ajaxInterceptorRules]);
 
                 // @ts-ignore
@@ -282,8 +281,6 @@ export const MainApp = () => {
 
   const testSendToContext = async () => {
     const tabId = await getCurrentTabId();
-    console.log(`send testSendToContext 9999`, tabId);
-    // client.send( 'get translate result' , this.query , true )
     // @ts-ignore
     send({
       id: await getCurrentTabId(),
@@ -293,7 +290,24 @@ export const MainApp = () => {
     }).then(res => {
       console.log(res, "这是返回值");
     }).catch(() => null); // 获取出错时仍然让此状态成功，只是值是 null，表示没有权限获取;
-    // clientInBackground.send("openContent", { type: "iframe", msg: "我来自iframeContent to content" });
+  };
+
+  const togglePanel = async () => {
+    send({
+      id: await getCurrentTabId(),
+      name: "toggle iframe",
+      data: { name: "hell12345" },
+      needResponse: true
+    }).then(res => {
+      console.log(res, "处理结果");
+    }).catch(() => null);
+    // console.log(await getCurrentTabId());
+    // const tabId = await getCurrentTabId();
+    // sendMessage(
+    //   "toggle iframe",
+    //   { code: "ok", msg: "我是向军", data: "get-todo >> onMessage" },
+    //   { context: "content-script", tabId }
+    // );
   };
 
   const addItem = () => {
@@ -313,7 +327,7 @@ export const MainApp = () => {
         }}
       >
         <Space>
-          <Button size="small" type="primary" onClick={() => toggleIframe()}>
+          <Button size="small" type="primary" onClick={togglePanel}>
             隐藏
           </Button>
           <Switch

@@ -5,11 +5,9 @@
  * @LastEditors: xiangjun02
  * @LastEditTime: 2022-04-05 21:34:06
  */
+
 export const toggleIframe = () => {
-  console.log("toggleIframe >> chrome.tabs.query");
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, "toggle");
-  });
+
 };
 
 export const insertScript = () => {

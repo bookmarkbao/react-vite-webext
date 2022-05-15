@@ -1,7 +1,6 @@
 /**
  * 内容脚本同时也是一个 Server 端，用来执行扩展程序发送过来的命令
  */
-
 import { createServer } from "connect.io";
 // import st from "./st";
 const server = createServer('contentPage');
@@ -12,7 +11,7 @@ const server = createServer('contentPage');
  * @param data
  * @param {Function} resolve
  */
-export function onGetLocation(data, resolve) {
+export function onGetLocation(data:any, resolve: any) {
   if (self === top) {
     resolve(JSON.parse(JSON.stringify(location)));
   }
@@ -21,7 +20,7 @@ export function onGetLocation(data, resolve) {
 /**
  * 接收到翻译命令时，翻译网页上的拖蓝
  */
-export function onTranslate(text) {
+export function onTranslate(text: any) {
   console.log(text, '我是网页内容的监听')
 //   st.query.text = getSelection().toString();
 //   st.safeTranslate();

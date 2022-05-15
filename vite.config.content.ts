@@ -1,5 +1,5 @@
 /*
- * @Descripttion: 
+ * @Descripttion:
  * @Author: xiangjun02
  * @Date: 2022-04-01 22:48:45
  * @LastEditors: xiangjun02
@@ -16,7 +16,7 @@ export default defineConfig({
   build: {
     watch: isDev
       ? {
-          include: [r("src/contentScripts/**/*"), r("src/components/**/*"),r("src/logic/**/*")],
+          include: [r("src/contentScripts/**/*"), r("src/components/**/*"),r("src/logic/**/*"), r("src/store/**/*")],
         }
       : undefined,
     outDir: r("extension/dist/contentScripts"),

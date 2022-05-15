@@ -9,6 +9,7 @@ import { Button } from "antd";
 import "./server";
 import client from "~/contentScriptsInject/client";
 import { sendMessage } from "webext-bridge";
+import store from "~/store/store";
 
 const testClients = () => {
   client.send("open options", { type: "content", msg: "我是来自page content元素的哟 666" });
@@ -21,18 +22,31 @@ const toggleSetIcon = () => {
     value: false
   });
 };
-export const ContentApp = (props: any) => {
-  const { onToggle } = props;
+
+const refreshCurrentPage = () => {
   // @ts-ignore
-  // const [icon, setIcon] = useEffect(true);
+  sendMessage("refresh-current-page", {
+    type: "refresh",
+    value: false
+  });
+};
+
+
+export const ContentApp = (props: any) => {
   return (
     <div className="dxx-content">
-      <Button onClick={() => onToggle()}>toggleIframe</Button>
-      <Button type="primary" onClick={testClients}>
+      <Button onClick={() => {
+        store.dispatch({type: 'switchBtn'})
+      }
+      }>toggleIframe</Button>
+      <Button  type="primary" onClick={testClients}>
         connect.io test
       </Button>
       <Button type="primary" onClick={toggleSetIcon}>
         toggleSetIcon
+      </Button>
+      <Button onClick={refreshCurrentPage}>
+        refreshCurrentPage
       </Button>
     </div>
   );

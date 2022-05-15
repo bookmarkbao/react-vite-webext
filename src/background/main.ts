@@ -15,5 +15,5 @@ if (import.meta.hot) {
   import("./contentScriptHMR");
 }
 
-import("./mainBackgroundOther")
+// import("./mainBackgroundOther")
 import("./mainBrowserAction")

@@ -9,14 +9,16 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import browser from "webextension-polyfill";
-import { ContentApp } from "./views/ContentApp";
+// import { ContentApp } from "./views/ContentApp";
 import { ContentIframe } from "./views/ContentIframe";
-import {  onMessage } from "webext-bridge";
+import store from "~/store/store";
 import "./server";
-// import "./serverBridge"
+import "./serverBridge";
 import "./style.css";
 
 const container = document.createElement("div");
+container.setAttribute("id", "dxAjaxInterceptorRoot");
+
 const root = document.createElement("div");
 const styleEl = document.createElement("link");
 const shadowDOM =
@@ -30,21 +32,29 @@ styleEl.setAttribute(
 shadowDOM.appendChild(styleEl);
 shadowDOM.appendChild(root);
 document.body.appendChild(container);
+
+
+let setShowCall = () => {
+};
 const AppMain = () => {
   const [show, setShow] = useState(false);
-  console.log(`appMain`, show)
-  onMessage("toggle iframe",(res)=>{
-    console.log("toggle iframe", res)
-     setShow(!show)
-  })
-
+  setShowCall = setShow;
   return (
     <>
-      <ContentIframe show={show}/>
-      <ContentApp onToggle={() => setShow(!show)}/>
+      <ContentIframe show={show} />
+      {false && <ContentApp onToggle={() => setShow(!show)} />}
     </>
   );
 };
+store.subscribe(() => {
+  const rootDom = document.getElementById("dxAjaxInterceptorRoot")
+  if(!rootDom) {
+    document.body.appendChild(container);
+  }
+  console.log(1112222, store.getState());
+  // setShow(store.getState().value)
+  setShowCall(store.getState().value);
+});
 
 ReactDOM.render(
   <React.StrictMode>

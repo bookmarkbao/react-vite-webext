@@ -16,7 +16,7 @@ export default defineConfig({
   build: {
     watch: isDev
       ? {
-          include: [r("src/contentScripts/**/*"), r("src/components/**/*"),r("src/logic/**/*"), r("src/store/**/*")],
+          include: [r("src/contentScripts/**/*"), r("src/components/**/*"), r("src/logic/**/*"), r("src/store/**/*"), r("src/network/**/*")],
         }
       : undefined,
     outDir: r("extension/dist/contentScripts"),

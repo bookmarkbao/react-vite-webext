@@ -11,6 +11,7 @@ import ReactDOM from "react-dom";
 import browser from "webextension-polyfill";
 // import { ContentApp } from "./views/ContentApp";
 import { ContentIframe } from "./views/ContentIframe";
+import { ContentReqApp } from "./views/ContentReqApp";
 import store from "~/store/store";
 import "./server";
 import "./serverBridge";
@@ -41,6 +42,7 @@ const AppMain = () => {
   setShowCall = setShow;
   return (
     <>
+      <ContentReqApp/>
       <ContentIframe show={show} />
       {false && <ContentApp onToggle={() => setShow(!show)} />}
     </>

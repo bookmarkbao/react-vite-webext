@@ -29,7 +29,7 @@ export function onTranslate(text: any, resolve: any) {
   //   st.query.text = getSelection().toString();
   //   st.safeTranslate();
   console.log("9999888888");
-  store.dispatch({ type: 'switchOn' });
+  store.dispatch({ type: "switchOn" });
   // @ts-ignore
   resolve(window.document.title);
 }
@@ -39,13 +39,25 @@ export function onTranslate(text: any, resolve: any) {
  * 第一种方法
  */
 const testOne = (data: any) => {
-  const myEvent = new CustomEvent("injectEvent", {
+  // const myEvent = new CustomEvent("injectEvent", {
+  //   detail: {
+  //     ...data
+  //   }
+  // });
+  // window.dispatchEvent(myEvent);
+
+  const myContentEvent = new CustomEvent("injectContentEvent", {
     detail: {
-      ...data
-    }
+      ...data,
+    },
   });
-  window.dispatchEvent(myEvent);
+  window.dispatchEvent(myContentEvent);
 };
+
+chrome.storage.local.get(["ajaxInterceptor_switchOn", "ajaxInterceptor_rules"], (result: any) => {
+  testOne({ key: "ajaxInterceptor_switchOn", value: result.ajaxInterceptor_switchOn });
+  testOne({ key: "ajaxInterceptor_rules", value: result.ajaxInterceptor_rules });
+});
 
 const textAutoExecuteXhr = () => {
   // 通知替换xhr
@@ -74,10 +86,9 @@ function fireCustomEvent(data: any) {
 const testPostMessage = () => {
   window.postMessage({
     type: "ajaxSwitchOn",
-    value: true
+    value: true,
   });
 };
-
 
 const openDebug = false;
 
@@ -94,19 +105,17 @@ export const saveToWin = (data: any, resolve: any) => {
   resolve({ code: 0, msg: "同步成功" });
 };
 
-
 /**
  * 需要返回值时，参数resolve
  */
 export function toggleIframe(text: any, resolve: any) {
-  store.dispatch({ type: 'switchOn' });
+  store.dispatch({ type: "switchOn" });
   resolve({
     code: 0,
     siteTitle: window.document.title,
-    server: "contentScript/server.ts"
+    server: "contentScript/server.ts",
   });
 }
-
 
 server.on("connect", (client) => {
   client.on("get location", onGetLocation);
@@ -114,6 +123,5 @@ server.on("connect", (client) => {
   client.on("toggle iframe", toggleIframe);
   client.on("update ajax interceptor", saveToWin);
 });
-
 
 export default server;

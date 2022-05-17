@@ -6,16 +6,25 @@
  * @LastEditTime: 2022-04-20 00:51:47
  */
 import { useState, useEffect } from "react";
-import { Switch } from "antd";
+import { Switch, Input } from "antd";
 import ReactJson from "react-json-view";
 import "./Replacer.less";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
+const txtFormat = (text: string) => {
+  try {
+    const txt = JSON.parse(text);
+    return JSON.stringify(txt, null, "\t");
+  } catch (e) {
+    return text;
+  }
+};
 const Replacer = (props: any) => {
   const { placeholder, showLabel, label = "Replace With", defaultValue = "", set } = props;
   const [showJSONEditor, setShowJSONEditor] = useState(false);
-  const [txt, setTxt] = useState(defaultValue);
-  const [src, setSrc] = useState({});
+  const [txt, setTxt] = useState(txtFormat(defaultValue));
+  const [src, setSrc] = useState();
+  const [showMaxRows, setShowMaxRows] = useState(false);
   useEffect(() => {
     try {
       let src = JSON.parse(defaultValue);
@@ -24,7 +33,8 @@ const Replacer = (props: any) => {
       }
     } catch (e) {
     }
-  },[]);
+  }, []);
+
 
   const handleOverrideTxtChange = (txt: string) => {
     let src;
@@ -37,34 +47,42 @@ const Replacer = (props: any) => {
     } catch (e) {
 
     }
-    setTxt(txt);
+    setTxt(txtFormat(txt));
     // 更新缓存
     set("overrideTxt", txt);
   };
 
   const handleJSONEditorChange = ({ updated_src: src }: any) => {
     let txt = JSON.stringify(src);
-    setTxt(txt);
+    setTxt(txtFormat(txt));
     setSrc(src);
     // 更新缓存
     set("overrideTxt", txt);
   };
   const handleEditorSwitch = (showJSONEditor: boolean) => {
-    setShowJSONEditor(showJSONEditor)
+    setShowJSONEditor(showJSONEditor);
   };
 
   return (
     <>
       {showLabel && <div className="replace-with"> {label} </div>}
-      <textarea
-        className="overrideTxt"
+      <Input.TextArea
         placeholder={placeholder}
-        style={{ resize: "none" }}
         value={txt}
+        autoSize={{ minRows: 2, maxRows: showMaxRows ? 999 : 6 }}
         onChange={e => handleOverrideTxtChange(e.target.value)}
       />
-      <Switch style={{ marginTop: "6px" }} onChange={handleEditorSwitch} checkedChildren="JSON Editor"
-              unCheckedChildren="JSON Editor" size="small" />
+
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <Switch style={{ marginTop: "6px" }} onChange={handleEditorSwitch} checkedChildren="JSON Editor"
+                unCheckedChildren="JSON Editor" size="small" />
+        <a onClick={() => {
+          setShowMaxRows(!showMaxRows);
+        }}>
+          {showMaxRows ? "收起" : "展开"}
+        </a>
+      </div>
+
       {showJSONEditor && (src ?
           <div className="JSONEditor">
             <ReactJson
@@ -82,7 +100,7 @@ const Replacer = (props: any) => {
     </>
   );
 };
-Replacer.propTypes =  {
+Replacer.propTypes = {
   placeholder: PropTypes.string,
   showLabel: PropTypes.bool,
   label: PropTypes.string,
@@ -90,6 +108,6 @@ Replacer.propTypes =  {
   updateAddBtnTop: PropTypes.func,
   set: PropTypes.func,
   index: PropTypes.number
-}
+};
 
-export default Replacer
+export default Replacer;

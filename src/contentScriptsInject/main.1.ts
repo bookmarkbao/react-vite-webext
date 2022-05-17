@@ -4,22 +4,17 @@ import { Ajax_Interceptor_Dx } from "~/const";
 let reqApiResult = [];
 const bucketStore = new Map();
 const reqApiList = new Set();
-// @ts-ignore
-window.reqApiList = reqApiList;
-// @ts-ignore
-window.bucketStore = bucketStore;
-
 // 命名空间
 let ajax_interceptor_dx: Ajax_Interceptor_Dx = {
   settings: {
     ajaxInterceptor_switchOn: false,
-    ajaxInterceptor_rules: []
+    ajaxInterceptor_rules: [],
   },
   originalXHR: window.XMLHttpRequest,
-  myXHR: function() {
+  myXHR: function () {
     const modifyResponse = () => {
       reqApiResult.push({
-        responseText: this.responseText
+        responseText: this.responseText,
       });
 
       const { hostname, pathname } = new URL(this.responseURL);
@@ -27,14 +22,9 @@ let ajax_interceptor_dx: Ajax_Interceptor_Dx = {
       reqApiList.add(ajaxReqURL);
       bucketStore.set(ajaxReqURL, this.responseText);
       // 去配置中查找，是否有符合条件的路由
-      const arrList = (ajax_interceptor_dx.settings.ajaxInterceptor_rules || []);
+      const arrList = ajax_interceptor_dx.settings.ajaxInterceptor_rules || [];
       arrList.forEach((item: any) => {
-        const {
-          filterType = "normal",
-          switchOn = true,
-          match,
-          overrideTxt = ""
-        } = item;
+        const { filterType = "normal", switchOn = true, match, overrideTxt = "" } = item;
         let matched = false;
         // 全局switchOn打开 ， 存在配置match
         if (switchOn && match) {
@@ -47,7 +37,7 @@ let ajax_interceptor_dx: Ajax_Interceptor_Dx = {
         }
         // 如果匹配成功，则进行结果修改
         if (matched) {
-           console.log(`main.ts===matched`, matched, this)
+          console.log(`main.ts===matched`, matched, this);
           this.responseText = overrideTxt;
           this.response = overrideTxt;
         }
@@ -73,7 +63,7 @@ let ajax_interceptor_dx: Ajax_Interceptor_Dx = {
           // 请求成功
           if (ajax_interceptor_dx.settings.ajaxInterceptor_switchOn) {
             // 开启拦截
-            console.log(`开启拦截============`)
+            console.log(`开启拦截============`);
             modifyResponse();
           }
           this.onload && this.onload.apply(this, args);
@@ -89,13 +79,13 @@ let ajax_interceptor_dx: Ajax_Interceptor_Dx = {
           Object.defineProperty(this, attr, {
             get: () => (this[`_${attr}`] === undefined ? xhr[attr] : this[`_${attr}`]),
             set: (val) => (this[`_${attr}`] = val),
-            enumerable: true
+            enumerable: true,
           });
         } else {
           Object.defineProperty(this, attr, {
             get: () => xhr[attr],
             set: (val) => (xhr[attr] = val),
-            enumerable: true
+            enumerable: true,
           });
         }
       }
@@ -103,20 +93,15 @@ let ajax_interceptor_dx: Ajax_Interceptor_Dx = {
   },
 
   originalFetch: window.fetch.bind(window),
-  myFetch: function(...args) {
+  myFetch: function (...args) {
     return ajax_interceptor_dx.originalFetch(...args).then((response) => {
       let txt = undefined;
-      console.log(`myFetch ====`)
+      console.log(`myFetch ====`);
 
       const { hostname, pathname } = new URL(response.url);
       const ajaxReqURL = hostname + pathname;
       reqApiList.add(ajaxReqURL);
-      ajax_interceptor_dx.settings.ajaxInterceptor_rules.forEach(({
-                                                                    filterType = "normal",
-                                                                    switchOn = true,
-                                                                    match,
-                                                                    overrideTxt = ""
-                                                                  }) => {
+      ajax_interceptor_dx.settings.ajaxInterceptor_rules.forEach(({ filterType = "normal", switchOn = true, match, overrideTxt = "" }) => {
         let matched = false;
         if (switchOn && match) {
           if (filterType === "normal" && response.url.indexOf(match) > -1) {
@@ -129,7 +114,7 @@ let ajax_interceptor_dx: Ajax_Interceptor_Dx = {
         if (matched) {
           window.dispatchEvent(
             new CustomEvent("pageScript", {
-              detail: { url: response.url, match }
+              detail: { url: response.url, match },
             })
           );
           txt = overrideTxt;
@@ -141,16 +126,16 @@ let ajax_interceptor_dx: Ajax_Interceptor_Dx = {
           start(controller) {
             controller.enqueue(new TextEncoder().encode(txt));
             controller.close();
-          }
+          },
         });
 
         const newResponse = new Response(stream, {
           headers: response.headers,
           status: response.status,
-          statusText: response.statusText
+          statusText: response.statusText,
         });
         const proxy = new Proxy(newResponse, {
-          get: function(target, name) {
+          get: function (target, name) {
             switch (name) {
               case "ok":
               case "redirected":
@@ -163,7 +148,7 @@ let ajax_interceptor_dx: Ajax_Interceptor_Dx = {
               default:
             }
             return target[name];
-          }
+          },
         });
 
         for (let key in proxy) {
@@ -177,7 +162,7 @@ let ajax_interceptor_dx: Ajax_Interceptor_Dx = {
         return response;
       }
     });
-  }
+  },
 };
 const switchAjaxInterceptor = () => {
   const switchAjaxInterceptor = Boolean(localStorage.getItem("ajaxInterceptor_switchOn"));
@@ -187,25 +172,24 @@ const switchAjaxInterceptor = () => {
   } catch (error) {
     console.log("出错了");
   }
-  console.log('main',switchAjaxInterceptor, ajaxInterceptor_rules)
+  console.log("main", switchAjaxInterceptor, ajaxInterceptor_rules);
   // 下面内容，切换拦截，菜又必要执行
   if (switchAjaxInterceptor) {
-    console.log(`走代理啦====`, ajax_interceptor_dx.myXHR)
+    console.log(`走代理啦====`);
     ajax_interceptor_dx["settings"]["ajaxInterceptor_rules"] = ajaxInterceptor_rules;
     ajax_interceptor_dx["settings"]["ajaxInterceptor_switchOn"] = switchAjaxInterceptor;
     window.XMLHttpRequest = ajax_interceptor_dx.myXHR;
     window.fetch = ajax_interceptor_dx.myFetch;
   } else {
-    console.log(`不走走代理啦====`)
+    console.log(`不走走代理啦====`);
     window.XMLHttpRequest = ajax_interceptor_dx.originalXHR;
     window.fetch = ajax_interceptor_dx.originalFetch;
   }
 };
 
-console.log('content script6666', window.XMLHttpRequest)
+console.log("content script6666", window.XMLHttpRequest);
 // 等待时机执行
-window.addEventListener("autoExecuteEvent", function(params: any) {
-  console.log(`autoExecuteEvent====等待时机执行`)
+window.addEventListener("autoExecuteEvent", function (params: any) {
+  console.log(`autoExecuteEvent====等待时机执行`);
   switchAjaxInterceptor();
 });
-

@@ -7,6 +7,8 @@
  * @LastEditTime: 2022-04-20 19:34:23
  */
 import { send } from "connect.io";
+// @ts-ignore
+import chromeCall from "chrome-call";
 // 读取某个配置想的所有文件
 const files = ["test99.js", "main.js"];
 const addScript = (src) => {
@@ -33,5 +35,4 @@ firstScript.addEventListener("load", () => {
     console.log(`=====执行firstScript`);
     window.dispatchEvent(myEvent);
 });
-
 

@@ -10,6 +10,12 @@ import "./server";
 import client from "~/contentScriptsInject/client";
 import { sendMessage } from "webext-bridge";
 import store from "~/store/store";
+import VConsole from 'vconsole';
+
+// const vConsole = new VConsole();
+// or init with options
+const vConsole = new VConsole({ theme: 'dark' });
+console.log("====vConsole", vConsole);
 
 const testClients = () => {
   client.send("open options", { type: "content", msg: "我是来自page content元素的哟 666" });

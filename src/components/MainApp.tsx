@@ -33,7 +33,7 @@ const dateFormat = (fmt: string, date: any) => {
 };
 
 // 数据同步到content页面
-const set = async (key: string, value: any) => {
+const set = async (key: string, value: any, needTip = false) => {
   const res = await send({
     id: await getCurrentTabId(),
     name: "update ajax interceptor",
@@ -43,6 +43,7 @@ const set = async (key: string, value: any) => {
     },
     needResponse: true
   });
+  if(!needTip) return ;
   if (res.code === 0) {
     message.success("同步成功");
   } else {
@@ -115,10 +116,10 @@ export const MainApp = () => {
     console.log(`saveChromeStorageLocal`, saveContext);
     chromeCall("storage.local.set", { ...saveContext });
     if (value === undefined) {
-      await set(types.INTERCEPTO_RULES, opt[types.INTERCEPTO_RULES]); // 数据同步过去
-      await set(types.SWITCH_ON, opt[types.SWITCH_ON]);
+      await set(types.INTERCEPTO_RULES, opt[types.INTERCEPTO_RULES], true); // 数据同步过去
+      await set(types.SWITCH_ON, opt[types.SWITCH_ON], true);
     } else {
-      await set(opt, value); // 数据同步过去
+      await set(opt, value, true); // 数据同步过去
     }
   };
 
@@ -154,7 +155,7 @@ export const MainApp = () => {
     clearTimeout(forceUpdateTimeout);
     forceUpdateTimeout = setTimeout(() => {
       saveChromeStorageLocal(key, value);
-    }, 1000);
+    }, 1500);
   };
 
 
@@ -211,7 +212,7 @@ export const MainApp = () => {
           <div className="panel-header" role="button" tabIndex={0} onClick={(e) => e.stopPropagation()}>
             <Input.Group compact style={{ flex: 1, display: "flex" }}>
               <Input placeholder="name" style={{ width: "220px" }} defaultValue={label}
-                     onChange={(e) => handleCommonChange("label", e.target.value, index)} />
+                     onChange={(e) => handleCommonChange("label", e.target.value, index, true)} />
               <Select defaultValue={filterType} style={{ width: "120px" }}
                       onChange={(e) => handleCommonChange("filterType", e, index, false)}>
                 <Option value="normal">normal</Option>
@@ -222,7 +223,7 @@ export const MainApp = () => {
                 style={{ flex: 1 }}
                 defaultValue={match}
                 // onClick={e => e.stopPropagation()}
-                onChange={(e) => handleCommonChange("match", e.target.value, index)}
+                onChange={(e) => handleCommonChange("match", e.target.value, index, true)}
               />
             </Input.Group>
             <Switch style={{ marginLeft: "10px", marginRight: "10px" }} size="small" defaultChecked={switchOn}

@@ -54,7 +54,7 @@ if (isDev) {
   chokidar.watch([r("src/manifest.ts"), r("package.json")]).on("change", () => {
     writeManifest();
   });
-  chokidar.watch([r("src/contentScriptsInject/*.ts")]).on("change", () => {
+  chokidar.watch([r("src/contentScriptsInject/*.ts"), r("src/network/*.ts")]).on("change", () => {
     tsupScripts();
   });
 }
